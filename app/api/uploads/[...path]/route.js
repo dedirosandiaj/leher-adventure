@@ -5,8 +5,12 @@ import { existsSync } from 'fs';
 
 export async function GET(request, { params }) {
   try {
-    const pathSegments = params.path;
-    const filePath = join(process.cwd(), 'public', 'uploads', ...pathSegments);
+    // Await params in Next.js 15+
+    const { path: pathSegments } = await params;
+    
+    // Ensure pathSegments is an array
+    const segments = Array.isArray(pathSegments) ? pathSegments : [pathSegments];
+    const filePath = join(process.cwd(), 'public', 'uploads', ...segments);
     
     // Security check: ensure path is within uploads directory
     const uploadsDir = join(process.cwd(), 'public', 'uploads');
