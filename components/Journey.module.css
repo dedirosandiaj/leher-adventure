@@ -1,138 +1,135 @@
 .journey {
-  background-color: var(--accent);
-  opacity: 0.95;
+  background: linear-gradient(180deg, var(--accent) 0%, #e8ebe6 100%);
+  padding: 6rem 0;
+  position: relative;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
 }
 
 .title {
   font-family: 'Crimson Pro', serif;
-  text-align: center;
-  font-size: 3.5rem;
+  font-size: 3rem;
   color: var(--primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   font-weight: 700;
 }
 
 .subtitle {
-  text-align: center;
   color: var(--primary);
   opacity: 0.8;
-  margin-bottom: 2rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
-.mapContainer {
-  position: relative;
-  width: 100%;
+/* Timeline Container */
+.timeline {
   max-width: 800px;
-  /* aspect-ratio replacement for perfect absolute SVG scaling (1000/800 = 125%) */
-  padding-bottom: 125%; 
-  height: 0;
-  margin: 3rem auto;
+  margin: 0 auto;
+  position: relative;
 }
 
-.trailLine {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+/* Timeline Item */
+.timelineItem {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
-.points {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
+.timelineItem:last-child {
+  margin-bottom: 0;
 }
 
-.mapPoint {
-  position: absolute;
-  width: 0;
-  height: 0;
+/* Timeline Marker (Left Side) */
+.timelineMarker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 40px;
 }
 
-.iconWrapper {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 60px;
-  height: 60px;
+.markerIcon {
+  width: 40px;
+  height: 40px;
   background: var(--secondary);
   color: var(--primary);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: 4px solid var(--accent);
-  box-shadow: 0 4px 15px rgba(242, 187, 80, 0.4);
-  transition: var(--transition);
-  cursor: pointer;
+  border: 3px solid var(--bg-light);
+  box-shadow: 0 4px 12px rgba(242, 187, 80, 0.3);
   z-index: 2;
 }
 
-.mapPoint:hover .iconWrapper {
-  transform: translate(-50%, -50%) scale(1.1) rotate(10deg);
-  background: var(--primary-light);
-  color: var(--accent);
+.timelineLine {
+  width: 3px;
+  flex: 1;
+  background: linear-gradient(180deg, var(--secondary) 0%, transparent 100%);
+  margin-top: 0.5rem;
+  min-height: 40px;
 }
 
-.pointContent {
-  position: absolute;
-  top: -2.1rem;
-  transform: none;
-  width: 280px;
+.timelineItem:last-child .timelineLine {
+  display: none;
+}
+
+/* Card */
+.card {
+  flex: 1;
   background: var(--bg-light);
-  padding: 1.5rem;
   border-radius: 16px;
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(43, 77, 89, 0.08);
-  z-index: 1;
+  box-shadow: 0 4px 20px rgba(43, 77, 89, 0.08);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
 }
 
-/* Dynamic positioning based on left/center/right classes */
-/* Left point = content goes to the right of icon */
-.mapPoint.left .pointContent {
-  left: 80px;
-  right: auto;
+.card:hover {
+  box-shadow: 0 8px 30px rgba(43, 77, 89, 0.12);
 }
 
-/* Right point = content goes to the left of icon */
-.mapPoint.right .pointContent {
-  right: 80px;
-  left: auto;
-}
-
-/* Center point = content goes to the right of icon */
-.mapPoint:not(.left):not(.right) .pointContent {
-  left: 80px;
-  right: auto;
-}
-
-.yearHeader {
+/* Card Header */
+.cardHeader {
+  width: 100%;
+  padding: 1.25rem 1.5rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(43, 77, 89, 0.1);
-  padding-bottom: 0.5rem;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cardHeader:hover {
+  background: rgba(43, 77, 89, 0.02);
+}
+
+.yearBadge {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .year {
-  font-weight: 800;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: var(--primary);
-  font-size: 1.25rem;
 }
 
-.statusBadge {
+.status {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
-  padding: 0.35rem 0.6rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 20px;
 }
 
@@ -142,86 +139,144 @@
 }
 
 .rencana {
-  background-color: #ddd;
+  background-color: #e0e0e0;
   color: #666;
 }
 
-.mountainsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.mountainCard {
-  background: white;
-  padding: 1rem 1.25rem;
-  border-radius: 8px;
-  border: 1px solid rgba(43, 77, 89, 0.05);
-  box-shadow: 0 2px 8px rgba(43, 77, 89, 0.03);
-  transition: var(--transition);
-  text-align: left;
-}
-
-.mountainCard:hover {
-  transform: translateX(3px);
-  border-color: var(--secondary);
-}
-
-.mountainCard h3 {
-  font-size: 1.1rem;
+.chevron {
   color: var(--primary);
-  margin: 0;
-  font-weight: 600;
-  line-height: 1.3;
+  opacity: 0.6;
+  transition: transform 0.3s ease, opacity 0.2s ease;
 }
 
+.chevron.rotate {
+  transform: rotate(180deg);
+  opacity: 1;
+}
 
+/* Card Content */
+.cardContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
 
+.cardContent.expanded {
+  max-height: 500px;
+  padding: 0 1.5rem 1.5rem;
+}
 
+/* Mountains Grid */
+.mountainsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(43, 77, 89, 0.08);
+}
 
+.mountainItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid rgba(43, 77, 89, 0.06);
+  transition: all 0.2s ease;
+}
+
+.mountainItem:hover {
+  border-color: var(--secondary);
+  transform: translateX(4px);
+}
+
+.mountainItem svg {
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.mountainItem span {
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  .mapContainer {
-    aspect-ratio: auto;
-    display: flex;
-    flex-direction: column;
-    margin: 2rem auto;
+  .journey {
+    padding: 4rem 0;
   }
-  .trailLine {
-    display: none;
+  
+  .header {
+    margin-bottom: 2.5rem;
+    padding: 0 1rem;
   }
-  .points {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-    align-items: center;
+  
+  .title {
+    font-size: 2.25rem;
   }
-  .mapPoint {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    height: auto;
+  
+  .subtitle {
+    font-size: 1rem;
   }
-  .iconWrapper {
-    position: static;
-    transform: none;
-    margin-bottom: 1rem;
+  
+  .timelineItem {
+    gap: 1rem;
   }
-  .mapPoint:hover .iconWrapper {
-    transform: scale(1.1) rotate(10deg);
+  
+  .timelineMarker {
+    width: 32px;
   }
-  .pointContent {
-    position: static;
-    transform: none;
-    width: 90%;
-    max-width: 350px;
+  
+  .markerIcon {
+    width: 32px;
+    height: 32px;
   }
-  .mapPoint.left .pointContent,
-  .mapPoint.right .pointContent,
-  .mapPoint:not(.left):not(.right) .pointContent {
-    right: auto;
-    left: auto;
+  
+  .markerIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .cardHeader {
+    padding: 1rem 1.25rem;
+  }
+  
+  .year {
+    font-size: 1.5rem;
+  }
+  
+  .yearBadge {
+    gap: 0.75rem;
+  }
+  
+  .cardContent.expanded {
+    padding: 0 1.25rem 1.25rem;
+  }
+  
+  .mountainsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .mountainItem {
+    padding: 0.75rem;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .title {
+    font-size: 2rem;
+  }
+  
+  .year {
+    font-size: 1.25rem;
+  }
+  
+  .status {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
   }
 }

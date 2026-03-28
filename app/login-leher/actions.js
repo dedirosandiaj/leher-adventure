@@ -29,7 +29,7 @@ export async function loginAction(prevState, formData) {
     const cookieStore = await cookies();
     cookieStore.set('admin_session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Set to false for Coolify deployment (adjust if using HTTPS)
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: '/',
