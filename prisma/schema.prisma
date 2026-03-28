@@ -1,0 +1,57 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+}
+
+model Journey {
+  id        String     @id @default(cuid())
+  year      String
+  status    String     @default("Rencana")
+  order     Int        @default(0)
+  mountains Mountain[]
+}
+
+model Mountain {
+  id        String   @id @default(cuid())
+  name      String
+  journeyId String
+  journey   Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  name      String
+  ig        String
+  order     Int      @default(0)
+}
+
+model Gallery {
+  id        String   @id @default(cuid())
+  type      String   // "video" or "image"
+  url       String   // Unsplash URL or YouTube ID
+  thumbnail String?  // Optional thumbnail for video
+  order     Int      @default(0)
+}
+
+model HeroSlide {
+  id        String   @id @default(cuid())
+  url       String
+  order     Int      @default(0)
+}
+
+model HeroText {
+  id          String   @id @default(cuid())
+  title       String   @default("Jelajahi Alam,")
+  subtitle    String   @default("Temukan Jati Diri.")
+  description String   @default("Komunitas pecinta alam yang berdedikasi untuk menjaga kelestarian hutan dan pegunungan Indonesia.")
+}

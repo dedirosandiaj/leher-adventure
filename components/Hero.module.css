@@ -1,0 +1,72 @@
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  color: var(--text-light);
+  overflow: hidden;
+  padding: 0;
+}
+
+.imageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.imageWrapper img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.imageWrapper.active {
+  opacity: 1;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(43, 77, 89, 0.7) 0%, rgba(43, 77, 89, 0.3) 100%);
+  z-index: -1;
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+}
+
+.title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 4.5rem;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.title span {
+  color: var(--secondary);
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+  opacity: 0.95;
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 3rem;
+  }
+}

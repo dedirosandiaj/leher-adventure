@@ -1,0 +1,38 @@
+.about {
+  background-color: #fff;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.content {
+  max-width: 800px;
+}
+
+.title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 3.5rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.divider {
+  width: 60px;
+  height: 4px;
+  background-color: var(--secondary);
+  margin: 0 auto 2.5rem;
+  border-radius: 2px;
+}
+
+.description {
+  font-size: 1.15rem;
+  color: var(--primary);
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+

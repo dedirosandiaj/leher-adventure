@@ -1,0 +1,227 @@
+.journey {
+  background-color: var(--accent);
+  opacity: 0.95;
+}
+
+.title {
+  font-family: 'Crimson Pro', serif;
+  text-align: center;
+  font-size: 3.5rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--primary);
+  opacity: 0.8;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.mapContainer {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  /* aspect-ratio replacement for perfect absolute SVG scaling (1000/800 = 125%) */
+  padding-bottom: 125%; 
+  height: 0;
+  margin: 3rem auto;
+}
+
+.trailLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.points {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.mapPoint {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.iconWrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: var(--secondary);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 4px solid var(--accent);
+  box-shadow: 0 4px 15px rgba(242, 187, 80, 0.4);
+  transition: var(--transition);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.mapPoint:hover .iconWrapper {
+  transform: translate(-50%, -50%) scale(1.1) rotate(10deg);
+  background: var(--primary-light);
+  color: var(--accent);
+}
+
+.pointContent {
+  position: absolute;
+  top: -2.1rem;
+  transform: none;
+  width: 280px;
+  background: var(--bg-light);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(43, 77, 89, 0.08);
+  z-index: 1;
+}
+
+/* Dynamic positioning based on left/center/right classes */
+/* Left point = content goes to the right of icon */
+.mapPoint.left .pointContent {
+  left: 80px;
+  right: auto;
+}
+
+/* Right point = content goes to the left of icon */
+.mapPoint.right .pointContent {
+  right: 80px;
+  left: auto;
+}
+
+/* Center point = content goes to the right of icon */
+.mapPoint:not(.left):not(.right) .pointContent {
+  left: 80px;
+  right: auto;
+}
+
+.yearHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(43, 77, 89, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.year {
+  font-weight: 800;
+  color: var(--primary);
+  font-size: 1.25rem;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  padding: 0.35rem 0.6rem;
+  border-radius: 20px;
+}
+
+.selesai {
+  background-color: var(--primary-light);
+  color: white;
+}
+
+.rencana {
+  background-color: #ddd;
+  color: #666;
+}
+
+.mountainsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mountainCard {
+  background: white;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid rgba(43, 77, 89, 0.05);
+  box-shadow: 0 2px 8px rgba(43, 77, 89, 0.03);
+  transition: var(--transition);
+  text-align: left;
+}
+
+.mountainCard:hover {
+  transform: translateX(3px);
+  border-color: var(--secondary);
+}
+
+.mountainCard h3 {
+  font-size: 1.1rem;
+  color: var(--primary);
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+
+
+
+
+@media (max-width: 768px) {
+  .mapContainer {
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    margin: 2rem auto;
+  }
+  .trailLine {
+    display: none;
+  }
+  .points {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    align-items: center;
+  }
+  .mapPoint {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+  }
+  .iconWrapper {
+    position: static;
+    transform: none;
+    margin-bottom: 1rem;
+  }
+  .mapPoint:hover .iconWrapper {
+    transform: scale(1.1) rotate(10deg);
+  }
+  .pointContent {
+    position: static;
+    transform: none;
+    width: 90%;
+    max-width: 350px;
+  }
+  .mapPoint.left .pointContent,
+  .mapPoint.right .pointContent,
+  .mapPoint:not(.left):not(.right) .pointContent {
+    right: auto;
+    left: auto;
+  }
+}

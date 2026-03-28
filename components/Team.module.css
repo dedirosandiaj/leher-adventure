@@ -1,0 +1,88 @@
+.team {
+  background-color: var(--bg-light);
+}
+
+.title {
+  font-family: 'Crimson Pro', serif;
+  text-align: center;
+  font-size: 3.5rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--primary);
+  opacity: 0.8;
+  margin-bottom: 4rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 20px;
+  text-align: center;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(43, 77, 89, 0.05);
+  border: 1px solid rgba(43, 77, 89, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow);
+  border-color: var(--secondary);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: var(--primary);
+  color: var(--secondary);
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.card h3 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.role {
+  display: block;
+  color: var(--primary-light);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.instagram {
+  color: var(--primary-light);
+  font-weight: 600;
+  text-decoration: none !important;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.instagram:hover {
+  color: var(--primary);
+}
