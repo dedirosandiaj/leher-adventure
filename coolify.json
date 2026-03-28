@@ -1,0 +1,27 @@
+{
+  "build": {
+    "type": "nixpacks"
+  },
+  "ports": [
+    {
+      "port": 3000,
+      "protocol": "http"
+    }
+  ],
+  "volumes": [
+    {
+      "source": "/data/uploads",
+      "target": "/app/public/uploads",
+      "type": "persistent"
+    },
+    {
+      "source": "/data/db",
+      "target": "/app/prisma",
+      "type": "persistent"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  }
+}
