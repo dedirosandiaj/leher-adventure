@@ -1,14 +1,15 @@
 [phases.build]
 cmds = [
   "mkdir -p public/uploads/hero public/uploads/gallery public/uploads/team",
-  "npm run build"
+  "npm run build",
+  "cp -r public .next/standalone/"
 ]
 
 [phases.setup]
 nixPkgs = ["nodejs_20", "python3"]
 
 [start]
-cmd = "npm start"
+cmd = "cd .next/standalone && node server.js"
 
 [env]
 NODE_ENV = "production"
