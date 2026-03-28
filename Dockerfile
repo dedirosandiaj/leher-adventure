@@ -13,8 +13,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm ci --only=production
 
-# Copy all files
+# Copy all files except uploads (will be mounted as volume)
 COPY . .
+RUN rm -rf public/uploads
 
 # Create necessary directories
 RUN mkdir -p prisma

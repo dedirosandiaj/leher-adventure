@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Next.js build output
+.next
+out
+
+# Uploads (will be mounted as volume)
+public/uploads
+
+# Database (will be mounted as volume)
+prisma/*.db
+prisma/dev.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+CHANGELOG.md
+
+# Scripts
+scripts
