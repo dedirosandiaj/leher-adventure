@@ -43,7 +43,11 @@ async function saveImageFile(file) {
   
   await writeFile(filepath, compressedBuffer);
   
-  // Return relative URL
+  // Return API URL for production, direct path for local
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction) {
+    return `/api/uploads/gallery/${filename}`;
+  }
   return `/uploads/gallery/${filename}`;
 }
 
