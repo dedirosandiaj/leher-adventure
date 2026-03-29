@@ -76,22 +76,29 @@ export default function UserManager({ users, currentAdmin }) {
             </div>
           </div>
           
-          <div className={styles.formRow}>
-            <div className={styles.inputGroup} style={{ gridColumn: 'span 2' }}>
-              <label>
-                {editingUser 
-                  ? 'Password (Kosongkan jika tidak diubah)' 
-                  : 'Password'}
-              </label>
-              <input 
-                type="password" 
-                name="password" 
-                placeholder="Minimal 6 karakter"
-                required={!editingUser}
-                minLength={6}
-              />
+          {!editingUser && (
+            <div className={styles.formRow}>
+              <div className={styles.inputGroup} style={{ gridColumn: 'span 2' }}>
+                <p className={styles.passwordInfo}>
+                  Password default: <strong>Passw0rdAdmin</strong> (untuk Admin) atau <strong>Passw0rdMember</strong> (untuk Member)
+                </p>
+              </div>
             </div>
-          </div>
+          )}
+          
+          {editingUser && (
+            <div className={styles.formRow}>
+              <div className={styles.inputGroup} style={{ gridColumn: 'span 2' }}>
+                <label>Password (Kosongkan jika tidak diubah)</label>
+                <input 
+                  type="password" 
+                  name="password" 
+                  placeholder="Minimal 6 karakter"
+                  minLength={6}
+                />
+              </div>
+            </div>
+          )}
           
           {(addState?.error || updateState?.error) && (
             <p className={styles.error}>{addState?.error || updateState?.error}</p>

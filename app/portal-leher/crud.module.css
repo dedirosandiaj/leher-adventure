@@ -48,6 +48,19 @@
   color: var(--primary);
 }
 
+.passwordInfo {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  background: rgba(52, 152, 219, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+}
+
+.passwordInfo strong {
+  color: var(--accent);
+}
+
 .inputGroup input,
 .inputGroup select {
   padding: 0.75rem 1rem;
