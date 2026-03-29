@@ -5,29 +5,21 @@ import { revalidatePath } from 'next/cache';
 import { uploadToS3, deleteFromS3, getKeyFromUrl } from '@/lib/s3';
 import sharp from 'sharp';
 
-// Upload to S3 with compression and convert to WebP
+// Upload to S3 dengan kompresi WebP 50%
 async function saveImageToS3(file, folder = 'team') {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
   
-  // Generate unique filename (gunakan .webp extension)
+  // Compress dan convert ke WebP (kualitas 50%)
+  const compressedBuffer = await sharp(buffer)
+    .webp({ quality: 50, effort: 6 })
+    .toBuffer();
+  
   const timestamp = Math.floor(Date.now() / 1000);
   const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^/.]+$/, '');
   const filename = `${timestamp}-${originalName}.webp`;
   const key = `${folder}/${filename}`;
   
-  // Compress dan convert ke WebP menggunakan Sharp
-  const compressedBuffer = await sharp(buffer)
-    .webp({ 
-      quality: 80,
-      effort: 6,
-    })
-    .resize(400, 400, {
-      fit: 'cover',
-    })
-    .toBuffer();
-  
-  // Upload ke S3
   const url = await uploadToS3(compressedBuffer, key, 'image/webp');
   
   return url;

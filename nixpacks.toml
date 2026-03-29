@@ -1,15 +1,11 @@
-[phases.setup]
-nixPkgs = ["nodejs_20", "python3", "postgresql"]
-
 [phases.build]
-cmds = [
-  "mkdir -p public/uploads/hero public/uploads/gallery public/uploads/team",
-  "npm run build"
-]
+cmds = ["npm install"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20"]
 
 [start]
-cmd = "chmod +x start.sh && ./start.sh"
+cmd = "bash start.sh"
 
-[env]
-NODE_ENV = "production"
-PORT = "3000"
+[nginx]
+client_max_body_size = "50M"

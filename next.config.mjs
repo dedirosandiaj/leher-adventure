@@ -18,7 +18,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: 10 * 1024 * 1024, // 10 MB dalam bytes
+      bodySizeLimit: 50 * 1024 * 1024, // 50 MB dalam bytes
     },
   },
 };

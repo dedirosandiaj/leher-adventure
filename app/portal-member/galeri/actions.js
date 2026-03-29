@@ -5,20 +5,20 @@ import { uploadToS3 } from '@/lib/s3';
 import { revalidatePath } from 'next/cache';
 import sharp from 'sharp';
 
-// Upload image to S3 with WebP compression
+// Upload image to S3 dengan kompresi WebP 50%
 async function saveImageToS3(file) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
+  
+  // Compress dan convert ke WebP (kualitas 50%)
+  const compressedBuffer = await sharp(buffer)
+    .webp({ quality: 50, effort: 6 })
+    .toBuffer();
   
   const timestamp = Math.floor(Date.now() / 1000);
   const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^/.]+$/, '');
   const filename = `${timestamp}-${originalName}.webp`;
   const key = `gallery/${filename}`;
-  
-  const compressedBuffer = await sharp(buffer)
-    .webp({ quality: 80, effort: 6 })
-    .resize(1200, 800, { fit: 'inside', withoutEnlargement: true })
-    .toBuffer();
   
   const url = await uploadToS3(compressedBuffer, key, 'image/webp');
   return url;

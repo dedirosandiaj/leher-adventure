@@ -1,11 +1,12 @@
 'use client';
-import { useActionState, useState, useRef, useEffect } from 'react';
-import { addHeroSlide, deleteHeroSlide } from './actions';
+import { useState, useRef, useEffect } from 'react';
+import { deleteHeroSlide } from './actions';
 import ConfirmModal from '../components/ConfirmModal';
 import styles from '../crud.module.css';
 
 export default function CrudHero({ slides }) {
-  const [state, formAction, isPending] = useActionState(addHeroSlide, null);
+  const [state, setState] = useState(null);
+  const [isPending, setIsPending] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [slideToDelete, setSlideToDelete] = useState(null);
@@ -23,6 +24,9 @@ export default function CrudHero({ slides }) {
       
       // Reset form
       if (formRef.current) formRef.current.reset();
+      
+      // Refresh page to show new slide
+      window.location.reload();
     }
   }, [state?.success]);
 
@@ -57,6 +61,28 @@ export default function CrudHero({ slides }) {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsPending(true);
+    setState(null);
+    
+    try {
+      const formData = new FormData(formRef.current);
+      
+      const response = await fetch('/api/hero/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const result = await response.json();
+      setState(result);
+    } catch (err) {
+      setState({ error: 'Gagal upload: ' + err.message });
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return (
     <div>
       <h1 className={styles.pageTitle}>Kelola Hero Slides</h1>
@@ -64,7 +90,7 @@ export default function CrudHero({ slides }) {
       {/* Form Upload Gambar */}
       <div className={styles.formCard}>
         <h2 className={styles.sectionTitle}>Tambah Slide Baru</h2>
-        <form ref={formRef} action={formAction} className={styles.form}>
+        <form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data" className={styles.form}>
           <div className={styles.formRow}>
             <div className={styles.inputGroup} style={{ gridColumn: 'span 2' }}>
               <label>Upload Gambar</label>
