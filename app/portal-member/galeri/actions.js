@@ -42,8 +42,7 @@ export async function uploadGalleryImage(prevState, formData) {
       data: {
         type: 'image',
         title,
-        image: imageUrl,
-        order: 0
+        image: imageUrl
       }
     });
     

@@ -32,9 +32,6 @@ export async function addGalleryItem(prevState, formData) {
   const imageFile = formData.get('imageFile');
   const url = formData.get('url')?.trim();
 
-  // Order diisi dengan timestamp agar yang terbaru di atas
-  const order = Math.floor(Date.now() / 1000);
-
   if (type === 'video') {
     if (!url) return { error: 'Video ID wajib diisi.' };
 
@@ -44,8 +41,7 @@ export async function addGalleryItem(prevState, formData) {
         title: title || 'Video', 
         image: url, 
         video_url: url,
-        thumbnail: null,
-        order 
+        thumbnail: null
       } 
     });
   } else {
@@ -58,8 +54,7 @@ export async function addGalleryItem(prevState, formData) {
       data: { 
         type: 'image',
         title: title || 'Gambar', 
-        image: imageUrl,
-        order 
+        image: imageUrl
       } 
     });
   }

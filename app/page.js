@@ -40,7 +40,7 @@ export default async function Home() {
 
   try {
     const [galleryData, heroSlidesData, heroTextData, aboutDataResult] = await Promise.all([
-      prisma.gallery.findMany({ orderBy: { order: 'desc' } }),
+      prisma.gallery.findMany({ orderBy: { id: 'desc' } }),
       prisma.heroSlide.findMany({ orderBy: { order: 'desc' } }),
       prisma.heroText.findFirst(),
       prisma.about.findFirst(),

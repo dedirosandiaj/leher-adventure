@@ -12,7 +12,7 @@ export const revalidate = 0;
 export default async function MemberGallery() {
   unstable_noStore();
   const items = await prisma.gallery.findMany({ 
-    orderBy: { order: 'desc' } 
+    orderBy: { id: 'desc' } 
   });
   
   // Convert image URLs to presigned URLs for images (skip videos)

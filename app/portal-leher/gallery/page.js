@@ -10,7 +10,7 @@ export const revalidate = 0;
 export default async function GalleryAdminPage() {
   unstable_noStore();
   // Order by descending (terbaru di atas)
-  const items = await prisma.gallery.findMany({ orderBy: { order: 'desc' } });
+  const items = await prisma.gallery.findMany({ orderBy: { id: 'desc' } });
   
   // Convert image/thumbnail URLs to presigned URLs for private S3 bucket
   const itemsWithPresignedUrls = await Promise.all(
