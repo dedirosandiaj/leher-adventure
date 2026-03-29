@@ -5,8 +5,14 @@ import ProfileForm from './ProfileForm';
 import { updateProfile } from './actions';
 import { logoutMember } from '@/app/login-member/actions';
 import styles from './profile.module.css';
+import { unstable_noStore } from 'next/cache';
+
+// Disable cache untuk selalu fetch data terbaru
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function MemberProfile() {
+  unstable_noStore();
   const cookieStore = await cookies();
   const memberId = cookieStore.get('memberId')?.value;
   

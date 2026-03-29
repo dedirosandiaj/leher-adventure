@@ -1,12 +1,16 @@
-export const dynamic = 'force-dynamic';
-
 import { prisma } from '@/lib/prisma';
 import { getPresignedUrl, getKeyFromUrl } from '@/lib/s3';
 import GalleryClient from './GalleryClient';
 import UploadForm from './UploadForm';
 import styles from './gallery.module.css';
+import { unstable_noStore } from 'next/cache';
+
+// Disable cache untuk selalu fetch data terbaru
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function MemberGallery() {
+  unstable_noStore();
   const items = await prisma.gallery.findMany({ 
     orderBy: { order: 'desc' } 
   });

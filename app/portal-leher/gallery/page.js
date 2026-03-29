@@ -1,8 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { getPresignedUrl, getKeyFromUrl } from '@/lib/s3';
 import CrudGallery from './CrudGallery';
+import { unstable_noStore } from 'next/cache';
+
+// Disable cache untuk selalu fetch data terbaru
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function GalleryAdminPage() {
+  unstable_noStore();
   // Order by descending (terbaru di atas)
   const items = await prisma.gallery.findMany({ orderBy: { order: 'desc' } });
   
