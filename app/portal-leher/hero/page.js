@@ -1,8 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { getPresignedUrl, getKeyFromUrl } from '@/lib/s3';
 import CrudHero from './CrudHero';
+import { unstable_noStore } from 'next/cache';
+
+// Disable cache untuk selalu fetch data terbaru
+export const revalidate = 0;
 
 export default async function HeroAdminPage() {
+  unstable_noStore();
   // Terbaru di atas (descending by order/timestamp)
   const slides = await prisma.heroSlide.findMany({ orderBy: { order: 'desc' } });
   

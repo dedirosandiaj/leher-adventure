@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { uploadToS3 } from '@/lib/s3';
 import sharp from 'sharp';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(request) {
   try {
@@ -31,6 +32,10 @@ export async function POST(request) {
     const order = Math.floor(Date.now() / 1000);
     
     await prisma.heroSlide.create({ data: { image: url, order } });
+    
+    // Revalidate cache
+    revalidatePath('/');
+    revalidatePath('/portal-leher/hero');
     
     return NextResponse.json({ success: 'Slide berhasil ditambahkan!' });
   } catch (err) {
