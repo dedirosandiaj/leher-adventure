@@ -3,65 +3,64 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-export async function addJourneyYear(prevState, formData) {
-  const year = formData.get('year')?.trim();
-  const status = formData.get('status') || 'Selesai';
-  if (!year) return { error: 'Tahun wajib diisi.' };
-
-  // Order berdasarkan tahun (numerik) agar sorting berfungsi
-  const order = parseInt(year, 10) || 0;
-
-  await prisma.journey.create({ data: { year, status, order } });
-  revalidatePath('/');
-  revalidatePath('/portal-leher/journey');
-  return { success: 'Tahun ekspedisi berhasil ditambahkan!' };
-}
-
-export async function updateJourney(prevState, formData) {
-  const id = formData.get('id');
-  const year = formData.get('year')?.trim();
-  const status = formData.get('status');
-  if (!id || !year) return { error: 'ID dan tahun wajib diisi.' };
-
-  // Update order berdasarkan tahun
-  const order = parseInt(year, 10) || 0;
-
-  await prisma.journey.update({ where: { id }, data: { year, status, order } });
-  revalidatePath('/');
-  revalidatePath('/portal-leher/journey');
-  return { success: 'Tahun ekspedisi berhasil diupdate!' };
-}
-
-export async function deleteJourney(id) {
-  await prisma.journey.delete({ where: { id } });
-  revalidatePath('/');
-  revalidatePath('/portal-leher/journey');
-}
-
 export async function addMountain(prevState, formData) {
   const name = formData.get('name')?.trim();
-  const journeyId = formData.get('journeyId');
-  if (!name || !journeyId) return { error: 'Nama gunung dan tahun wajib dipilih.' };
-
-  await prisma.mountain.create({ data: { name, journeyId } });
-  revalidatePath('/');
-  revalidatePath('/portal-leher/journey');
-  return { success: 'Gunung berhasil ditambahkan!' };
-}
-
-export async function updateMountain(prevState, formData) {
+  const year = parseInt(formData.get('year'));
+  const status = formData.get('status') || 'Rencana';
   const id = formData.get('id');
-  const name = formData.get('name')?.trim();
-  if (!id || !name) return { error: 'ID dan nama gunung wajib diisi.' };
 
-  await prisma.mountain.update({ where: { id }, data: { name } });
-  revalidatePath('/');
-  revalidatePath('/portal-leher/journey');
-  return { success: 'Gunung berhasil diupdate!' };
+  if (!name || !year) {
+    return { error: 'Nama gunung dan tahun wajib diisi.' };
+  }
+
+  try {
+    if (id) {
+      // Update
+      await prisma.mountain.update({
+        where: { id: parseInt(id) },
+        data: { name, year, status },
+      });
+    } else {
+      // Create
+      await prisma.mountain.create({
+        data: { name, year, status },
+      });
+    }
+    
+    revalidatePath('/');
+    revalidatePath('/portal-leher/journey');
+    return { success: id ? 'Gunung berhasil diupdate!' : 'Gunung berhasil ditambahkan!' };
+  } catch (error) {
+    console.error('Error saving mountain:', error);
+    return { error: 'Gagal menyimpan: ' + error.message };
+  }
 }
 
 export async function deleteMountain(id) {
-  await prisma.mountain.delete({ where: { id } });
-  revalidatePath('/');
-  revalidatePath('/portal-leher/journey');
+  try {
+    await prisma.mountain.delete({ where: { id } });
+    revalidatePath('/');
+    revalidatePath('/portal-leher/journey');
+    return { success: 'Gunung dihapus!' };
+  } catch (error) {
+    console.error('Error deleting mountain:', error);
+    return { error: 'Gagal menghapus.' };
+  }
+}
+
+export async function moveMountain(id, newStatus) {
+  try {
+    const mountainId = parseInt(id);
+    console.log('Moving mountain', mountainId, 'to status', newStatus);
+    await prisma.mountain.update({
+      where: { id: mountainId },
+      data: { status: newStatus },
+    });
+    revalidatePath('/');
+    revalidatePath('/portal-leher/journey');
+    return { success: 'Status diperbarui!' };
+  } catch (error) {
+    console.error('Error moving mountain:', error);
+    return { error: 'Gagal mengubah status.' };
+  }
 }

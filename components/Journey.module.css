@@ -134,13 +134,18 @@
 }
 
 .selesai {
-  background-color: var(--primary-light);
+  background-color: #4caf50;
+  color: white;
+}
+
+.berlangsung {
+  background-color: #ff9800;
   color: white;
 }
 
 .rencana {
-  background-color: #e0e0e0;
-  color: #666;
+  background-color: #2196f3;
+  color: white;
 }
 
 .chevron {
@@ -169,10 +174,16 @@
 /* Mountains Grid */
 .mountainsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(43, 77, 89, 0.08);
+}
+
+@media (max-width: 500px) {
+  .mountainsGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mountainItem {
@@ -184,6 +195,7 @@
   border-radius: 10px;
   border: 1px solid rgba(43, 77, 89, 0.06);
   transition: all 0.2s ease;
+  flex-wrap: nowrap;
 }
 
 .mountainItem:hover {
@@ -196,10 +208,22 @@
   flex-shrink: 0;
 }
 
-.mountainItem span {
+.mountainName {
   color: var(--primary);
   font-weight: 500;
   font-size: 0.95rem;
+  flex: 1;
+}
+
+.mountainStatus {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  border-radius: 12px;
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 /* Mobile Responsive */

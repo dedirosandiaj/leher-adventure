@@ -2,32 +2,19 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { writeFile, unlink } from 'fs/promises';
-import { existsSync, mkdirSync } from 'fs';
-import path from 'path';
+import { uploadToS3, deleteFromS3, getKeyFromUrl } from '@/lib/s3';
 import sharp from 'sharp';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'hero');
-
-// Ensure upload directory exists
-function ensureUploadDir() {
-  if (!existsSync(UPLOAD_DIR)) {
-    mkdirSync(UPLOAD_DIR, { recursive: true });
-  }
-}
-
-// Save uploaded file with compression and convert to WebP
-async function saveImageFile(file) {
-  ensureUploadDir();
-  
+// Upload to S3 with compression and convert to WebP
+async function saveImageToS3(file, folder = 'hero') {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
   
   // Generate unique filename (gunakan .webp extension)
-  const timestamp = Date.now();
-  const originalName = file.name.replace(/[^a-zA-zA-Z0-9.-]/g, '_').replace(/\.[^/.]+$/, '');
+  const timestamp = Math.floor(Date.now() / 1000);
+  const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^/.]+$/, '');
   const filename = `${timestamp}-${originalName}.webp`;
-  const filepath = path.join(UPLOAD_DIR, filename);
+  const key = `${folder}/${filename}`;
   
   // Compress dan convert ke WebP menggunakan Sharp
   const compressedBuffer = await sharp(buffer)
@@ -41,14 +28,10 @@ async function saveImageFile(file) {
     })
     .toBuffer();
   
-  await writeFile(filepath, compressedBuffer);
+  // Upload ke S3
+  const url = await uploadToS3(compressedBuffer, key, 'image/webp');
   
-  // Return API URL for production, direct path for local
-  const isProduction = process.env.NODE_ENV === 'production';
-  if (isProduction) {
-    return `/api/uploads/hero/${filename}`;
-  }
-  return `/uploads/hero/${filename}`;
+  return url;
 }
 
 export async function addHeroSlide(prevState, formData) {
@@ -57,35 +40,43 @@ export async function addHeroSlide(prevState, formData) {
     return { error: 'File gambar wajib diupload.' };
   }
   
-  const url = await saveImageFile(imageFile);
+  const url = await saveImageToS3(imageFile, 'hero');
+  console.log('Saving hero slide with URL:', url);
   
-  // Order berdasarkan timestamp (terbaru di atas)
-  const order = Date.now();
+  // Order berdasarkan timestamp (terbaru di atas) - gunakan seconds bukan milliseconds
+  const order = Math.floor(Date.now() / 1000);
 
-  await prisma.heroSlide.create({ data: { url, order } });
+  try {
+    await prisma.heroSlide.create({ data: { image: url, order } });
+    console.log('Hero slide saved successfully');
+  } catch (err) {
+    console.error('Error saving hero slide:', err);
+    throw err;
+  }
   revalidatePath('/');
   revalidatePath('/portal-leher/hero');
   return { success: 'Slide berhasil ditambahkan!' };
 }
 
 export async function deleteHeroSlide(id) {
-  // Get slide data untuk hapus file gambar
+  // Get slide data untuk hapus file dari S3
   const slide = await prisma.heroSlide.findUnique({ where: { id } });
   
-  if (slide?.url) {
-    // Hapus file gambar dari folder uploads
-    const filename = path.basename(slide.url);
-    const filepath = path.join(UPLOAD_DIR, filename);
-    try {
-      if (existsSync(filepath)) {
-        await unlink(filepath);
+  if (slide?.image) {
+    // Hapus file dari S3
+    const key = getKeyFromUrl(slide.image);
+    if (key) {
+      try {
+        await deleteFromS3(key);
+        console.log('Deleted from S3:', key);
+      } catch (err) {
+        console.error('Error deleting from S3:', err);
       }
-    } catch (err) {
-      console.error('Error deleting file:', err);
     }
   }
   
   await prisma.heroSlide.delete({ where: { id } });
   revalidatePath('/');
   revalidatePath('/portal-leher/hero');
+  return { success: 'Slide berhasil dihapus!' };
 }

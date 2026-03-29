@@ -1,0 +1,15 @@
+.memberContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2b4d59 0%, #1a2f38 100%);
+  padding-bottom: 75px; /* Space for nav 65px + 10px extra */
+  display: flex;
+  flex-direction: column;
+}
+
+.mainContent {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+}

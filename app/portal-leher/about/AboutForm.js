@@ -15,39 +15,12 @@ export default function AboutForm({ about }) {
         <form action={formAction} className={styles.form}>
           <div className={styles.formRow}>
             <div className={styles.inputGroup} style={{ gridColumn: 'span 2' }}>
-              <label>Judul</label>
-              <input 
-                type="text" 
-                name="title" 
-                placeholder="Tentang Kami" 
-                defaultValue={about?.title || ''} 
-                required
-              />
-            </div>
-          </div>
-          
-          <div className={styles.formRow}>
-            <div className={styles.inputGroup} style={{ gridColumn: 'span 2' }}>
-              <label>Paragraf 1</label>
+              <label>Content (gunakan double enter untuk paragraf baru)</label>
               <textarea 
-                name="paragraph1" 
-                placeholder="Deskripsi paragraf pertama..."
-                defaultValue={about?.paragraph1 || ''}
-                rows="4"
-                style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd'}}
-                required
-              />
-            </div>
-          </div>
-          
-          <div className={styles.formRow}>
-            <div className={styles.inputGroup} style={{ gridColumn: 'span 2' }}>
-              <label>Paragraf 2</label>
-              <textarea 
-                name="paragraph2" 
-                placeholder="Deskripsi paragraf kedua..."
-                defaultValue={about?.paragraph2 || ''}
-                rows="4"
+                name="content" 
+                placeholder="Deskripsi Tentang Kami..."
+                defaultValue={about?.content || ''}
+                rows="10"
                 style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd'}}
                 required
               />
@@ -68,9 +41,10 @@ export default function AboutForm({ about }) {
       <div className={styles.listCard}>
         <h2 className={styles.sectionTitle}>Preview</h2>
         <div style={{padding: '2rem', background: 'var(--primary)', color: 'white', borderRadius: '12px'}}>
-          <h2 style={{fontSize: '2rem', marginBottom: '1rem', color: 'var(--secondary)'}}>{about?.title}</h2>
-          <p style={{fontSize: '1.1rem', marginBottom: '1rem', lineHeight: '1.8'}}>{about?.paragraph1}</p>
-          <p style={{fontSize: '1.1rem', lineHeight: '1.8'}}>{about?.paragraph2}</p>
+          <h2 style={{fontSize: '2rem', marginBottom: '1rem', color: 'var(--secondary)'}}>Tentang Kami</h2>
+          {about?.content?.split('\n\n').map((paragraph, i) => (
+            <p key={i} style={{fontSize: '1.1rem', marginBottom: '1rem', lineHeight: '1.8'}}>{paragraph}</p>
+          ))}
         </div>
       </div>
     </div>

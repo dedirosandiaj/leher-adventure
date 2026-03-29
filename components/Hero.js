@@ -11,15 +11,15 @@ const DEFAULT_SLIDES = [
 ];
 
 const DEFAULT_TEXT = {
-  title: 'Jelajahi Alam,',
-  subtitle: 'Temukan Jati Diri.',
-  description: 'Komunitas pecinta alam yang berdedikasi untuk menjaga kelestarian hutan dan pegunungan Indonesia.'
+  title_line1: 'Selamat Datang di',
+  title_line2: 'Leher Adventure',
+  description: 'Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.'
 };
 
 export default function Hero({ slides: propSlides, heroText }) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = propSlides?.length > 0 ? propSlides.map(s => s.url) : DEFAULT_SLIDES;
+  const slides = propSlides?.length > 0 ? propSlides.filter(Boolean) : DEFAULT_SLIDES;
   const text = heroText || DEFAULT_TEXT;
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function Hero({ slides: propSlides, heroText }) {
       ))}
       <div className={styles.overlay}></div>
       <div className={`${styles.content} container`}>
-        <h1 className={styles.title}>{text?.title}<br /><span>{text?.subtitle}</span></h1>
+        <h1 className={styles.title}>{text?.title_line1}<br /><span>{text?.title_line2}</span></h1>
         <p className={styles.subtitle}>{text?.description}</p>
         <div className={styles.actions}>
           <a href="#tentang-kami" className="btn btn-primary">Mulai Petualangan</a>

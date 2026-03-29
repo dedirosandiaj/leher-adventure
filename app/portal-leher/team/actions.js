@@ -2,76 +2,69 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { writeFile, unlink } from 'fs/promises';
-import { existsSync, mkdirSync } from 'fs';
-import path from 'path';
+import { uploadToS3, deleteFromS3, getKeyFromUrl } from '@/lib/s3';
 import sharp from 'sharp';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'team');
-
-// Ensure upload directory exists
-function ensureUploadDir() {
-  if (!existsSync(UPLOAD_DIR)) {
-    mkdirSync(UPLOAD_DIR, { recursive: true });
-  }
-}
-
-// Save uploaded file with compression and convert to WebP
-async function savePhotoFile(file) {
-  ensureUploadDir();
-  
+// Upload to S3 with compression and convert to WebP
+async function saveImageToS3(file, folder = 'team') {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
   
   // Generate unique filename (gunakan .webp extension)
-  const timestamp = Date.now();
+  const timestamp = Math.floor(Date.now() / 1000);
   const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^/.]+$/, '');
   const filename = `${timestamp}-${originalName}.webp`;
-  const filepath = path.join(UPLOAD_DIR, filename);
+  const key = `${folder}/${filename}`;
   
   // Compress dan convert ke WebP menggunakan Sharp
   const compressedBuffer = await sharp(buffer)
     .webp({ 
-      quality: 80, // Kualitas 80% (good balance antara kualitas dan ukuran)
-      effort: 6,   // Compression effort (0-6, 6 = best compression)
+      quality: 80,
+      effort: 6,
     })
-    .resize(400, 400, { // Max resolution 400x400 untuk foto profile
+    .resize(400, 400, {
       fit: 'cover',
-      withoutEnlargement: true,
     })
     .toBuffer();
   
-  await writeFile(filepath, compressedBuffer);
+  // Upload ke S3
+  const url = await uploadToS3(compressedBuffer, key, 'image/webp');
   
-  // Return API URL for production, direct path for local
-  const isProduction = process.env.NODE_ENV === 'production';
-  if (isProduction) {
-    return `/api/uploads/team/${filename}`;
-  }
-  return `/uploads/team/${filename}`;
+  return url;
 }
 
 export async function addTeamMember(prevState, formData) {
   const name = formData.get('name')?.trim();
   const ig = formData.get('ig')?.trim();
+  const photoFile = formData.get('photoFile');
 
-  if (!name || !ig) return { error: 'Nama dan Instagram wajib diisi.' };
+  console.log('Adding team member:', { name, ig, photoFile: photoFile?.name, photoFileSize: photoFile?.size });
+
+  if (!name) return { error: 'Nama wajib diisi.' };
+  if (!ig) return { error: 'Instagram handle wajib diisi.' };
 
   let photo = null;
-  const photoFile = formData.get('photoFile');
   if (photoFile && photoFile.size > 0) {
-    photo = await savePhotoFile(photoFile);
+    try {
+      photo = await saveImageToS3(photoFile, 'team');
+      console.log('Photo uploaded to S3:', photo);
+    } catch (err) {
+      console.error('Error uploading photo:', err);
+      return { error: 'Gagal upload foto: ' + err.message };
+    }
   }
 
-  // Order berdasarkan timestamp
-  const order = Date.now();
-
-  await prisma.teamMember.create({
-    data: { name, ig, photo, order },
-  });
+  try {
+    await prisma.teamMember.create({ data: { name, ig, photo } });
+    console.log('Team member created with photo:', photo);
+  } catch (err) {
+    console.error('Error creating team member:', err);
+    return { error: 'Gagal simpan ke database: ' + err.message };
+  }
+  
   revalidatePath('/');
   revalidatePath('/portal-leher/team');
-  return { success: 'Anggota berhasil ditambahkan!' };
+  return { success: 'Anggota tim berhasil ditambahkan!' };
 }
 
 export async function updateTeamMember(prevState, formData) {
@@ -79,42 +72,56 @@ export async function updateTeamMember(prevState, formData) {
   const name = formData.get('name')?.trim();
   const ig = formData.get('ig')?.trim();
   const existingPhoto = formData.get('existingPhoto');
+  const photoFile = formData.get('photoFile');
 
   if (!id || !name || !ig) return { error: 'ID, nama, dan Instagram wajib diisi.' };
 
+  // Get current member data untuk hapus foto lama
+  const currentMember = await prisma.teamMember.findUnique({ where: { id } });
+
   let photo = existingPhoto || null;
-  const photoFile = formData.get('photoFile');
   if (photoFile && photoFile.size > 0) {
-    photo = await savePhotoFile(photoFile);
+    photo = await saveImageToS3(photoFile, 'team');
+    
+    // Hapus foto lama dari S3 jika ada dan berbeda dengan yang baru
+    if (currentMember?.photo && currentMember.photo !== photo) {
+      const oldKey = getKeyFromUrl(currentMember.photo);
+      if (oldKey) {
+        try {
+          await deleteFromS3(oldKey);
+          console.log('Deleted old photo from S3:', oldKey);
+        } catch (err) {
+          console.error('Error deleting old photo from S3:', err);
+        }
+      }
+    }
   }
 
-  await prisma.teamMember.update({
-    where: { id },
-    data: { name, ig, photo },
-  });
+  await prisma.teamMember.update({ where: { id }, data: { name, ig, photo } });
   revalidatePath('/');
   revalidatePath('/portal-leher/team');
-  return { success: 'Anggota berhasil diupdate!' };
+  return { success: 'Anggota tim berhasil diupdate!' };
 }
 
 export async function deleteTeamMember(id) {
-  // Get member data untuk hapus file foto
+  // Get member data untuk hapus file dari S3
   const member = await prisma.teamMember.findUnique({ where: { id } });
   
   if (member?.photo) {
-    // Hapus file foto dari folder uploads
-    const filename = path.basename(member.photo);
-    const filepath = path.join(UPLOAD_DIR, filename);
-    try {
-      if (existsSync(filepath)) {
-        await unlink(filepath);
+    // Hapus file dari S3
+    const key = getKeyFromUrl(member.photo);
+    if (key) {
+      try {
+        await deleteFromS3(key);
+        console.log('Deleted from S3:', key);
+      } catch (err) {
+        console.error('Error deleting from S3:', err);
       }
-    } catch (err) {
-      console.error('Error deleting file:', err);
     }
   }
   
   await prisma.teamMember.delete({ where: { id } });
   revalidatePath('/');
   revalidatePath('/portal-leher/team');
+  return { success: 'Anggota tim berhasil dihapus!' };
 }

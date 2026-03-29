@@ -17,7 +17,7 @@ const UserIcon = () => (
 );
 
 function TeamCard({ member }) {
-  const igUsername = member.ig.replace('@', '');
+  const igUsername = member.ig?.replace('@', '') || '';
   
   return (
     <div className={styles.card}>
@@ -28,12 +28,16 @@ function TeamCard({ member }) {
               src={member.photo} 
               alt={member.name}
               loading="lazy"
+              onError={(e) => {
+                console.error('Failed to load photo:', member.photo);
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
             />
-          ) : (
-            <div className={styles.avatarPlaceholder}>
-              <UserIcon />
-            </div>
-          )}
+          ) : null}
+          <div className={styles.avatarPlaceholder} style={{display: member.photo ? 'none' : 'flex'}}>
+            <UserIcon />
+          </div>
         </div>
         
         <div className={styles.info}>

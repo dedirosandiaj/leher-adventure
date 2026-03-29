@@ -28,9 +28,6 @@ function JourneyCard({ item, index, isOpen, onToggle }) {
         <button className={styles.cardHeader} onClick={onToggle}>
           <div className={styles.yearBadge}>
             <span className={styles.year}>{item.year}</span>
-            <span className={`${styles.status} ${item.status === 'Selesai' ? styles.selesai : styles.rencana}`}>
-              {item.status}
-            </span>
           </div>
           <div className={`${styles.chevron} ${isOpen ? styles.rotate : ''}`}>
             <ChevronDown />
@@ -42,7 +39,10 @@ function JourneyCard({ item, index, isOpen, onToggle }) {
             {item.mountains.map((m, idx) => (
               <div key={idx} className={styles.mountainItem}>
                 <MountainIcon />
-                <span>{m.name}</span>
+                <span className={styles.mountainName}>{m.name}</span>
+                <span className={`${styles.mountainStatus} ${styles[m.status.toLowerCase()]}`}>
+                  {m.status}
+                </span>
               </div>
             ))}
           </div>
@@ -72,7 +72,7 @@ export default function JourneyClient({ journeys }) {
         <div className={styles.timeline}>
           {journeys.map((item, index) => (
             <JourneyCard
-              key={item.id || index}
+              key={item.year}
               item={item}
               index={index}
               isOpen={openIndex === index}

@@ -62,10 +62,10 @@ export default function SidebarNav({ logoutAction }) {
           Kelola Galeri
         </Link>
         <Link 
-          href="/portal-leher/profile" 
-          className={isActive('/portal-leher/profile') ? styles.active : ''}
+          href="/portal-leher/kelola-user" 
+          className={isActive('/portal-leher/kelola-user') ? styles.active : ''}
         >
-          Profil Admin
+          Kelola User
         </Link>
         <Link href="/">Kembali ke Web</Link>
       </nav>

@@ -1,0 +1,87 @@
+.gallery {
+  min-height: calc(100vh - 75px);
+  padding: 0 1.5rem 1rem;
+}
+
+.title {
+  font-family: 'Crimson Pro', serif;
+  color: white;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  padding-top: 2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #eee;
+}
+
+.item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.item:hover img {
+  transform: scale(1.05);
+}
+
+.playIcon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modalContent {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16/9;
+  background: black;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modalContent img,
+.modalContent iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}

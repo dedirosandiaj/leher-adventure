@@ -1,0 +1,200 @@
+.home {
+  min-height: calc(100vh - 75px);
+  padding: 0;
+  padding-bottom: 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-top: 2rem;
+  background: rgba(0,0,0,0.1);
+  padding: 2rem 1.5rem;
+  border-radius: 0 0 24px 24px;
+}
+
+.logo {
+  height: 60px;
+  margin-bottom: 1.5rem;
+}
+
+.welcome {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.75rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.username {
+  color: var(--secondary);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 0 1.5rem;
+}
+
+.statCard {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.statNumber {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.journeysSection {
+  margin-bottom: 2rem;
+  padding: 0 1.5rem;
+}
+
+.sectionTitle {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.25rem;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.journeysList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.journeyCard {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.journeyYear {
+  font-size: 0.85rem;
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.journeyMountains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mountainName {
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+}
+
+.journeyStatus {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 0 1.5rem;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 1.25rem;
+  border-radius: 16px;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.menuItem:active {
+  transform: scale(0.98);
+}
+
+.menuIcon {
+  font-size: 1.75rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: 12px;
+}
+
+.menuText {
+  flex: 1;
+}
+
+.menuText h3 {
+  font-size: 1rem;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.menuText p {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.arrow {
+  color: var(--secondary);
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.logoutForm {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0 1.5rem;
+}
+
+.logoutBtn {
+  background: rgba(231, 76, 60, 0.1);
+  color: #ff6b6b;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  padding: 0.875rem 2.5rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  max-width: 200px;
+}
+
+.logoutBtn:active {
+  background: rgba(231, 76, 60, 0.2);
+  transform: scale(0.98);
+}

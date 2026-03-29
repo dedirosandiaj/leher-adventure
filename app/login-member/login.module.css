@@ -1,0 +1,119 @@
+.loginCard {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.logo {
+  margin-bottom: 1.5rem;
+}
+
+.logo img {
+  height: 60px;
+  width: auto;
+}
+
+.title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.8rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  text-align: left;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(242, 187, 80, 0.2);
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  background: #fdf0ed;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.loginBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+}
+
+.loginBtn:hover {
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.loginBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.backLink {
+  display: block;
+  margin-top: 1.5rem;
+  color: #666;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--primary);
+}
+
+@media (max-width: 480px) {
+  .loginCard {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+}

@@ -8,6 +8,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 's3.ucentric.id',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   experimental: {

@@ -126,32 +126,13 @@ export default function CrudGallery({ items }) {
               )}
             </div>
           ) : (
-            <>
-              <div className={styles.inputGroup} style={{marginTop:'1rem'}}>
-                <label>YouTube Video ID</label>
-                <input type="text" name="url" placeholder="Contoh: dQw4w9WgXcQ" required />
-              </div>
-              <div className={styles.inputGroup} style={{marginTop:'1rem'}}>
-                <label>Upload Thumbnail</label>
-                <input 
-                  ref={thumbnailInputRef}
-                  type="file" 
-                  name="thumbnailFile" 
-                  accept="image/*"
-                  onChange={handleThumbnailChange}
-                  required
-                />
-                {thumbnailPreview && (
-                  <div className={styles.imagePreview}>
-                    <img 
-                      src={thumbnailPreview} 
-                      alt="Thumbnail Preview" 
-                      style={{maxWidth: '200px', maxHeight: '150px', marginTop: '10px', borderRadius: '8px'}}
-                    />
-                  </div>
-                )}
-              </div>
-            </>
+            <div className={styles.inputGroup} style={{marginTop:'1rem'}}>
+              <label>YouTube Video ID</label>
+              <input type="text" name="url" placeholder="Contoh: dQw4w9WgXcQ" required />
+              <small style={{color: '#666', marginTop: '0.25rem', display: 'block'}}>
+                Thumbnail akan diambil otomatis dari YouTube
+              </small>
+            </div>
           )}
           
           {state?.error && <p className={styles.error}>{state.error}</p>}
@@ -174,7 +155,7 @@ export default function CrudGallery({ items }) {
             {items.map(item => (
               <div key={item.id} className={styles.galleryThumb}>
                 <img
-                  src={item.type === 'video' ? (item.thumbnail || `https://img.youtube.com/vi/${item.url}/mqdefault.jpg`) : item.url}
+                  src={item.type === 'video' ? (item.thumbnail || `https://img.youtube.com/vi/${item.image}/0.jpg`) : item.image}
                   alt="Gallery item"
                 />
                 <div className={styles.thumbLabel}>{item.type === 'video' ? '▶ Video' : '🖼 Foto'}</div>

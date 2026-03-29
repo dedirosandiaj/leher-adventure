@@ -4,54 +4,58 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
-model Admin {
-  id       String @id @default(cuid())
-  username String @unique
+model about {
+  id         Int       @id @default(autoincrement())
+  content    String?   @default("Leher Adventure adalah komunitas petualangan...")
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model admin {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
   password String
+  role     String? @default("admin")
 }
 
-model Journey {
-  id        String     @id @default(cuid())
-  year      String
-  status    String     @default("Rencana")
-  order     Int        @default(0)
-  mountains Mountain[]
+model gallery {
+  id         Int       @id @default(autoincrement())
+  title      String
+  image      String
+  video_url  String?
+  order      Int?      @default(0)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  type       String?   @default("image")
+  thumbnail  String?
 }
 
-model Mountain {
-  id        String   @id @default(cuid())
-  name      String
-  journeyId String
-  journey   Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+model heroslide {
+  id         Int       @id @default(autoincrement())
+  image      String
+  order      Int?      @default(0)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
 }
 
-model TeamMember {
-  id        String   @id @default(cuid())
-  name      String
-  ig        String
-  order     Int      @default(0)
+model herotext {
+  id          Int       @id @default(autoincrement())
+  title_line1 String?   @default("Selamat Datang di")
+  title_line2 String?   @default("Leher Adventure")
+  description String?   @default("Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.")
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
 }
 
-model Gallery {
-  id        String   @id @default(cuid())
-  type      String   // "video" or "image"
-  url       String   // Unsplash URL or YouTube ID
-  thumbnail String?  // Optional thumbnail for video
-  order     Int      @default(0)
+model mountain {
+  id         Int      @id @default(autoincrement())
+  name       String
+  year       Int?     @default(2024)
+  status     String?  @default("Rencana")
 }
 
-model HeroSlide {
-  id        String   @id @default(cuid())
-  url       String
-  order     Int      @default(0)
-}
-
-model HeroText {
-  id          String   @id @default(cuid())
-  title       String   @default("Jelajahi Alam,")
-  subtitle    String   @default("Temukan Jati Diri.")
-  description String   @default("Komunitas pecinta alam yang berdedikasi untuk menjaga kelestarian hutan dan pegunungan Indonesia.")
+model teammember {
+  id    Int     @id @default(autoincrement())
+  name  String
+  ig    String
+  photo String?
 }

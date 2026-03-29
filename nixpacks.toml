@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "python3"]
+nixPkgs = ["nodejs_20", "python3", "postgresql"]
 
 [phases.build]
 cmds = [
@@ -8,7 +8,7 @@ cmds = [
 ]
 
 [start]
-cmd = "npm start"
+cmd = "chmod +x start.sh && ./start.sh"
 
 [env]
 NODE_ENV = "production"
