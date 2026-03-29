@@ -1,24 +1,13 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
-import { uploadGalleryImage } from './actions';
+import { useState } from 'react';
 import styles from './upload.module.css';
 
 export default function UploadForm() {
-  const [state, formAction, isPending] = useActionState(uploadGalleryImage, null);
   const [preview, setPreview] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (state?.success) {
-      setPreview(null);
-      setIsOpen(false);
-      // Reset form
-      document.getElementById('uploadForm').reset();
-      // Refresh page to show new image
-      window.location.reload();
-    }
-  }, [state]);
+  const [isPending, setIsPending] = useState(false);
+  const [state, setState] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -26,6 +15,35 @@ export default function UploadForm() {
       const reader = new FileReader();
       reader.onloadend = () => setPreview(reader.result);
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsPending(true);
+    setState(null);
+    
+    try {
+      const formData = new FormData(e.target);
+      
+      const response = await fetch('/api/gallery/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const result = await response.json();
+      setState(result);
+      
+      if (result.success) {
+        setPreview(null);
+        setIsOpen(false);
+        e.target.reset();
+        window.location.reload();
+      }
+    } catch (err) {
+      setState({ error: 'Gagal upload: ' + err.message });
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -42,7 +60,7 @@ export default function UploadForm() {
         <div className={styles.formContainer}>
           <h3 className={styles.formTitle}>Upload Foto ke Gallery</h3>
           
-          <form id="uploadForm" action={formAction}>
+          <form id="uploadForm" onSubmit={handleSubmit}>
             <input type="hidden" name="title" value="Gambar" />
             
             <div className={styles.inputGroup}>

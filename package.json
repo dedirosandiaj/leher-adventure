@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "NODE_OPTIONS='--max-http-header-size=65536 --max-old-space-size=4096' next dev --turbo=false",
+    "dev": "NODE_OPTIONS='--max-http-header-size=65536 --max-old-space-size=4096' next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

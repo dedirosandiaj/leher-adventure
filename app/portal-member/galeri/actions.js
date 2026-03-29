@@ -5,6 +5,15 @@ import { uploadToS3 } from '@/lib/s3';
 import { revalidatePath } from 'next/cache';
 import sharp from 'sharp';
 
+// Helper untuk mendapatkan timestamp WIB (Indonesia)
+function getWIBTimestamp() {
+  const now = new Date();
+  // WIB = UTC+7
+  const wibOffset = 7 * 60 * 60 * 1000; // 7 jam dalam milliseconds
+  const wibTime = new Date(now.getTime() + wibOffset);
+  return Math.floor(wibTime.getTime() / 1000);
+}
+
 // Upload image to S3 dengan kompresi WebP 50%
 async function saveImageToS3(file) {
   const bytes = await file.arrayBuffer();
@@ -16,7 +25,7 @@ async function saveImageToS3(file) {
     .webp({ quality: 50, effort: 6 })
     .toBuffer();
   
-  const timestamp = Math.floor(Date.now() / 1000);
+  const timestamp = getWIBTimestamp();
   const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^/.]+$/, '');
   const filename = `${timestamp}-${originalName}.webp`;
   const key = `gallery/${filename}`;

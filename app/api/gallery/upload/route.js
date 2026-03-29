@@ -7,8 +7,7 @@ import { revalidatePath } from 'next/cache';
 // Helper untuk mendapatkan timestamp WIB (Indonesia)
 function getWIBTimestamp() {
   const now = new Date();
-  // WIB = UTC+7
-  const wibOffset = 7 * 60 * 60 * 1000; // 7 jam dalam milliseconds
+  const wibOffset = 7 * 60 * 60 * 1000;
   const wibTime = new Date(now.getTime() + wibOffset);
   return Math.floor(wibTime.getTime() / 1000);
 }
@@ -16,10 +15,11 @@ function getWIBTimestamp() {
 export async function POST(request) {
   try {
     const formData = await request.formData();
-    const imageFile = formData.get('imageFile');
+    const imageFile = formData.get('image');
+    const title = formData.get('title')?.trim() || 'Gallery Image';
     
     if (!imageFile || imageFile.size === 0) {
-      return NextResponse.json({ error: 'File gambar wajib diupload.' }, { status: 400 });
+      return NextResponse.json({ error: 'Pilih gambar terlebih dahulu.' }, { status: 400 });
     }
     
     // Compress dan convert ke WebP (kualitas 50%)
@@ -27,29 +27,32 @@ export async function POST(request) {
     const buffer = Buffer.from(bytes);
     
     const compressedBuffer = await sharp(buffer)
-      .rotate() // Auto-rotate berdasarkan EXIF metadata
+      .rotate()
       .webp({ quality: 50, effort: 6 })
       .toBuffer();
     
     const timestamp = getWIBTimestamp();
     const originalName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/\.[^/.]+$/, '');
     const filename = `${timestamp}-${originalName}.webp`;
-    const key = `hero/${filename}`;
+    const key = `gallery/${filename}`;
     
-    const url = await uploadToS3(compressedBuffer, key, 'image/webp');
+    const imageUrl = await uploadToS3(compressedBuffer, key, 'image/webp');
     
-    // Order berdasarkan timestamp WIB (terbaru di atas)
-    const order = getWIBTimestamp();
+    // Save to database
+    await prisma.gallery.create({
+      data: {
+        type: 'image',
+        title,
+        image: imageUrl
+      }
+    });
     
-    await prisma.heroSlide.create({ data: { image: url, order } });
-    
-    // Revalidate cache
+    revalidatePath('/portal-member/galeri');
     revalidatePath('/');
-    revalidatePath('/portal-leher/hero');
     
-    return NextResponse.json({ success: 'Slide berhasil ditambahkan!' });
-  } catch (err) {
-    console.error('Error uploading hero slide:', err);
-    return NextResponse.json({ error: 'Gagal upload: ' + err.message }, { status: 500 });
+    return NextResponse.json({ success: 'Gambar berhasil diupload!' });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return NextResponse.json({ error: 'Gagal upload gambar. Coba lagi.' }, { status: 500 });
   }
 }
