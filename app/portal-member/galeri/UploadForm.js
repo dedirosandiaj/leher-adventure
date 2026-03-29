@@ -15,6 +15,8 @@ export default function UploadForm() {
       setIsOpen(false);
       // Reset form
       document.getElementById('uploadForm').reset();
+      // Refresh page to show new image
+      window.location.reload();
     }
   }, [state]);
 

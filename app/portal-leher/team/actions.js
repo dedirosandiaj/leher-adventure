@@ -12,6 +12,7 @@ async function saveImageToS3(file, folder = 'team') {
   
   // Compress dan convert ke WebP (kualitas 50%)
   const compressedBuffer = await sharp(buffer)
+    .rotate() // Auto-rotate berdasarkan EXIF metadata
     .webp({ quality: 50, effort: 6 })
     .toBuffer();
   

@@ -18,6 +18,7 @@ export async function POST(request) {
     const buffer = Buffer.from(bytes);
     
     const compressedBuffer = await sharp(buffer)
+      .rotate() // Auto-rotate berdasarkan EXIF metadata
       .webp({ quality: 50, effort: 6 })
       .toBuffer();
     
