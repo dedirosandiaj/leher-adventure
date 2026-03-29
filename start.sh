@@ -4,6 +4,9 @@ set -e
 echo "Installing dependencies..."
 npm install
 
+echo "Building Next.js application..."
+npm run build
+
 echo "Initializing database..."
 node scripts/init-db.js
 
