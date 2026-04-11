@@ -11,20 +11,21 @@ export const revalidate = 0;
 
 export default async function MemberGallery() {
   unstable_noStore();
-  const items = await prisma.gallery.findMany({ 
-    orderBy: { id: 'desc' } 
+  const items = await prisma.media.findMany({ 
+    where: { section: 'GALLERY' },
+    orderBy: { createdAt: 'desc' } 
   });
   
   // Convert image URLs to presigned URLs for images (skip videos)
   const itemsWithUrls = await Promise.all(
     items.map(async (item) => {
-      if (item.type === 'video') return item;
+      if (item.type === 'VIDEO') return item;
       
-      if (item.image) {
-        const key = getKeyFromUrl(item.image);
+      if (item.url) {
+        const key = getKeyFromUrl(item.url);
         if (key) {
           try {
-            return { ...item, image: await getPresignedUrl(key, 86400) };
+            return { ...item, url: await getPresignedUrl(key, 86400) };
           } catch (err) {
             console.error('Error generating presigned URL:', err);
           }

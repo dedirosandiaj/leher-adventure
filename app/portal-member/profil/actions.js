@@ -40,23 +40,17 @@ export async function updateProfile(prevState, formData) {
   const memberId = cookieStore.get('memberId')?.value;
   
   console.log('UpdateProfile - memberId from cookie:', memberId);
-  console.log('UpdateProfile - parsedInt:', parseInt(memberId));
   
   if (!memberId) {
     return { error: 'Sesi tidak valid.' };
   }
   
-  const parsedId = parseInt(memberId);
-  if (isNaN(parsedId)) {
-    console.log('UpdateProfile - parsedId is NaN');
-    return { error: 'Akses ditolak. ID tidak valid.' };
-  }
-  
-  const member = await prisma.admin.findUnique({
-    where: { id: parsedId }
+  const member = await prisma.user.findUnique({
+    where: { id: memberId }
   });
   
   console.log('UpdateProfile - member found:', member);
+  console.log('UpdateProfile - member.username:', member?.username);
   
   if (!member) {
     return { error: 'Akses ditolak. Member tidak ditemukan.' };
@@ -67,10 +61,25 @@ export async function updateProfile(prevState, formData) {
   const photoFile = formData.get('photoFile');
   const existingPhoto = formData.get('existingPhoto');
   
-  // Get team member
-  let teamMember = await prisma.teamMember.findFirst({
-    where: { ig: member.username }
-  });
+  // Jika member ini adalah team member (isTeam=true), update langsung
+  // Jika bukan, cari team member yang ig-nya sama dengan username member
+  let teamMember = member;
+  
+  if (!member.isTeam) {
+    // Cari team member yang ig-nya sama dengan username member login
+    const searchIg = member.username || ig;
+    console.log('UpdateProfile - searching team member with ig:', searchIg);
+    teamMember = await prisma.user.findFirst({
+      where: { ig: searchIg, isTeam: true }
+    });
+    console.log('UpdateProfile - team member found:', teamMember);
+    
+    if (!teamMember) {
+      return { error: 'Data team member tidak ditemukan. Hubungi admin.' };
+    }
+  } else {
+    console.log('UpdateProfile - member is team member, updating directly');
+  }
   
   let photo = existingPhoto || null;
   
@@ -91,17 +100,11 @@ export async function updateProfile(prevState, formData) {
     photo = await saveImageToS3(photoFile, 'team');
   }
   
-  // Update or create team member
-  if (teamMember) {
-    await prisma.teamMember.update({
-      where: { id: teamMember.id },
-      data: { name, ig, photo }
-    });
-  } else {
-    await prisma.teamMember.create({
-      data: { name, ig, photo }
-    });
-  }
+  // Update team member data
+  await prisma.user.update({
+    where: { id: teamMember.id },
+    data: { name, ig, photo }
+  });
   
   revalidatePath('/portal-member/profil');
   revalidatePath('/');

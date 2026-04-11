@@ -11,20 +11,16 @@ export async function loginAction(prevState, formData) {
   const password = formData.get('password');
 
   try {
-    // Scaffold initial admin if the Database is entirely empty 
-    const adminCount = await prisma.admin.count();
-    if (adminCount === 0) {
-       const hash = await bcrypt.hash('admin123', 10);
-       await prisma.admin.create({ data: { username: 'admin', password: hash } });
-    }
-
-    const admin = await prisma.admin.findUnique({ where: { username } });
+    // Cari user dengan role ADMIN
+    const admin = await prisma.user.findFirst({ 
+      where: { username, role: 'ADMIN' } 
+    });
     
     if (!admin || !(await bcrypt.compare(password, admin.password))) {
       return { error: 'Username atau password salah!' };
     }
 
-    const token = await signToken({ id: admin.id, username: admin.username });
+    const token = await signToken({ id: admin.id, username: admin.username, role: admin.role });
     
     const cookieStore = await cookies();
     cookieStore.set('admin_session', token, {
@@ -42,4 +38,40 @@ export async function loginAction(prevState, formData) {
   // Next.js redirect needs to happen outside the try/catch block 
   // because it throws a specific error that Next.js intercepts
   redirect('/portal-leher');
+}
+
+export async function resetPasswordAction(prevState, formData) {
+  const username = formData.get('username')?.trim();
+
+  if (!username) {
+    return { error: 'Username wajib diisi!' };
+  }
+
+  try {
+    // Cari user berdasarkan username
+    const user = await prisma.user.findUnique({ 
+      where: { username } 
+    });
+    
+    if (!user) {
+      return { error: 'User tidak ditemukan!' };
+    }
+
+    // Hash password default
+    const defaultPassword = 'Passw0rdAdmin';
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    // Update password
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword }
+    });
+
+    return { 
+      success: `Password untuk "${username}" berhasil direset. Silakan login dengan password default.` 
+    };
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return { error: 'Terjadi kesalahan sistem.' };
+  }
 }

@@ -41,15 +41,15 @@ export async function addGalleryItem(prevState, formData) {
   const imageFile = formData.get('imageFile');
   const url = formData.get('url')?.trim();
 
-  if (type === 'video') {
+  if (type === 'VIDEO') {
     if (!url) return { error: 'Video ID wajib diisi.' };
 
-    await prisma.gallery.create({ 
+    await prisma.media.create({ 
       data: { 
-        type: 'video',
+        type: 'VIDEO',
         title: title || 'Video', 
-        image: url, 
-        video_url: url,
+        url: url, 
+        section: 'GALLERY',
         thumbnail: null
       } 
     });
@@ -59,11 +59,12 @@ export async function addGalleryItem(prevState, formData) {
 
     const imageUrl = await saveImageToS3(imageFile, 'gallery');
 
-    await prisma.gallery.create({ 
+    await prisma.media.create({ 
       data: { 
-        type: 'image',
+        type: 'IMAGE',
         title: title || 'Gambar', 
-        image: imageUrl
+        url: imageUrl,
+        section: 'GALLERY'
       } 
     });
   }
@@ -75,10 +76,10 @@ export async function addGalleryItem(prevState, formData) {
 
 export async function deleteGalleryItem(id) {
   // Get item data untuk hapus file dari S3
-  const item = await prisma.gallery.findUnique({ where: { id } });
+  const item = await prisma.media.findUnique({ where: { id } });
   
   // Hapus image/thumbnail dari S3
-  const urlToDelete = item?.type === 'video' ? item?.thumbnail : item?.image;
+  const urlToDelete = item?.type === 'VIDEO' ? item?.thumbnail : item?.url;
   if (urlToDelete) {
     const key = getKeyFromUrl(urlToDelete);
     if (key) {
@@ -91,7 +92,7 @@ export async function deleteGalleryItem(id) {
     }
   }
   
-  await prisma.gallery.delete({ where: { id } });
+  await prisma.media.delete({ where: { id } });
   revalidatePath('/');
   revalidatePath('/portal-leher/gallery');
   return { success: 'Item galeri berhasil dihapus!' };

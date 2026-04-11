@@ -10,22 +10,25 @@ export const revalidate = 0;
 export default async function GalleryAdminPage() {
   unstable_noStore();
   // Order by descending (terbaru di atas)
-  const items = await prisma.gallery.findMany({ orderBy: { id: 'desc' } });
+  const items = await prisma.media.findMany({ 
+    where: { section: 'GALLERY' },
+    orderBy: { createdAt: 'desc' } 
+  });
   
   // Convert image/thumbnail URLs to presigned URLs for private S3 bucket
   const itemsWithPresignedUrls = await Promise.all(
     items.map(async (item) => {
       const updatedItem = { ...item };
       
-      // Skip videos (image field contains YouTube video ID, not S3 URL)
-      if (item.type === 'video') return updatedItem;
+      // Skip videos (url field contains YouTube video ID, not S3 URL)
+      if (item.type === 'VIDEO') return updatedItem;
       
-      // Handle image field
-      if (item.image) {
-        const key = getKeyFromUrl(item.image);
+      // Handle url field
+      if (item.url) {
+        const key = getKeyFromUrl(item.url);
         if (key) {
           try {
-            updatedItem.image = await getPresignedUrl(key, 86400);
+            updatedItem.url = await getPresignedUrl(key, 86400);
           } catch (err) {
             console.error('Error generating presigned URL for gallery image:', err);
           }

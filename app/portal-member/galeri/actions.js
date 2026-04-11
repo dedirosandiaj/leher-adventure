@@ -47,11 +47,12 @@ export async function uploadGalleryImage(prevState, formData) {
     const imageUrl = await saveImageToS3(file);
     
     // Save to database
-    await prisma.gallery.create({
+    await prisma.media.create({
       data: {
-        type: 'image',
+        type: 'IMAGE',
         title,
-        image: imageUrl
+        url: imageUrl,
+        section: 'GALLERY'
       }
     });
     

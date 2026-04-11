@@ -20,7 +20,7 @@ export default function HeroTextForm({ heroText }) {
                 type="text" 
                 name="title_line1" 
                 placeholder="Selamat Datang di" 
-                defaultValue={heroText?.title_line1 || ''} 
+                defaultValue={heroText?.titleLine1 || ''} 
                 required
               />
             </div>
@@ -30,7 +30,7 @@ export default function HeroTextForm({ heroText }) {
                 type="text" 
                 name="title_line2" 
                 placeholder="Leher Adventure" 
-                defaultValue={heroText?.title_line2 || ''} 
+                defaultValue={heroText?.titleLine2 || ''} 
                 required
               />
             </div>
@@ -65,8 +65,8 @@ export default function HeroTextForm({ heroText }) {
         <h2 className={styles.sectionTitle}>Preview Text</h2>
         <div style={{padding: '2rem', background: 'var(--primary)', color: 'white', borderRadius: '12px'}}>
           <h1 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
-            {heroText?.title_line1}<br />
-            <span style={{color: 'var(--secondary)'}}>{heroText?.title_line2}</span>
+            {heroText?.titleLine1}<br />
+            <span style={{color: 'var(--secondary)'}}>{heroText?.titleLine2}</span>
           </h1>
           <p style={{fontSize: '1.1rem', opacity: 0.9}}>{heroText?.description}</p>
         </div>

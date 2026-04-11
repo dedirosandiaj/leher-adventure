@@ -1,61 +1,188 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model about {
-  id         Int       @id @default(autoincrement())
-  content    String?   @default("Leher Adventure adalah komunitas petualangan...")
-  updated_at DateTime? @default(now()) @db.Timestamp(6)
+model About {
+  id        String   @id @default(uuid()) @db.Uuid
+  content   String   @default("Leher Adventure adalah komunitas petualangan...")
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
-model admin {
-  id       Int     @id @default(autoincrement())
-  username String  @unique
-  password String
-  role     String? @default("admin")
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  username  String   @unique
+  password  String
+  email     String   @unique
+  name      String
+  role      UserRole @default(MEMBER)
+  phone     String?
+  photo     String?
+  ig        String?
+  isTeam    Boolean  @default(false)  // Tampilkan di section Team
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  equipments UserEquipment[]
+  registrations JourneyRegistration[]
 }
 
-model gallery {
-  id         Int       @id @default(autoincrement())
-  title      String
-  image      String
-  video_url  String?
-  order      Int?      @default(0)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  type       String?   @default("image")
-  thumbnail  String?
+enum UserRole {
+  ADMIN
+  MEMBER
 }
 
-model heroslide {
-  id         Int       @id @default(autoincrement())
-  image      String
-  order      Int?      @default(0)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
+model Media {
+  id        String       @id @default(uuid()) @db.Uuid
+  title     String?
+  url       String
+  type      MediaType    @default(IMAGE)
+  section   MediaSection @default(GALLERY)
+  order     Int          @default(0)
+  thumbnail String?
+  createdAt DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt DateTime     @updatedAt @db.Timestamp(6)
 }
 
-model herotext {
-  id          Int       @id @default(autoincrement())
-  title_line1 String?   @default("Selamat Datang di")
-  title_line2 String?   @default("Leher Adventure")
-  description String?   @default("Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.")
-  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+enum MediaType {
+  IMAGE
+  VIDEO
 }
 
-model mountain {
-  id         Int      @id @default(autoincrement())
+enum MediaSection {
+  HERO
+  GALLERY
+}
+
+model HeroText {
+  id          String   @id @default(uuid()) @db.Uuid
+  titleLine1  String   @default("Selamat Datang di")
+  titleLine2  String   @default("Leher Adventure")
+  description String   @default("Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.")
+  updatedAt   DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Mountain {
+  id         String   @id @default(uuid()) @db.Uuid
   name       String
-  year       Int?     @default(2024)
-  status     String?  @default("Rencana")
+  height     Int?
+  location   String?
+  difficulty String?
+  image      String?
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @updatedAt @db.Timestamp(6)
+
+  journeys Journey[]
 }
 
-model teammember {
-  id    Int     @id @default(autoincrement())
-  name  String
-  ig    String
-  photo String?
+model Journey {
+  id          String        @id @default(uuid()) @db.Uuid
+  mountainId  String        @db.Uuid
+  year        Int           @default(2024)
+  status      JourneyStatus @default(PLANNED)
+  startDate   DateTime?
+  endDate     DateTime?
+  description String?
+  createdAt   DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime      @updatedAt @db.Timestamp(6)
+
+  mountain Mountain @relation(fields: [mountainId], references: [id], onDelete: Cascade)
+  registrations JourneyRegistration[]
+  expenses Expense[]
+}
+
+model JourneyRegistration {
+  id        String   @id @default(uuid()) @db.Uuid
+  journeyId String   @db.Uuid
+  userId    String   @db.Uuid
+  phone     String
+  email     String
+  ktpNumber String
+  ktpPhoto  String
+  status    RegistrationStatus @default(PENDING)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([journeyId, userId])
+  @@map("journey_registration")
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Expense {
+  id          String        @id @default(uuid()) @db.Uuid
+  journeyId   String?       @db.Uuid
+  category    ExpenseCategory
+  title       String
+  amount      Int
+  description String?
+  date        DateTime      @default(now())
+  createdAt   DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime      @updatedAt @db.Timestamp(6)
+
+  journey Journey? @relation(fields: [journeyId], references: [id], onDelete: SetNull)
+
+  @@map("expense")
+}
+
+enum ExpenseCategory {
+  LOGISTICS
+  SIMAKSI
+  TRANSPORTATION
+  EQUIPMENT_RENTAL
+  OTHER
+}
+
+enum JourneyStatus {
+  PLANNED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model EquipmentCategory {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  items EquipmentItem[]
+}
+
+model EquipmentItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  categoryId  String   @db.Uuid
+  name        String
+  description String?
+  required    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @db.Timestamp(6)
+
+  category EquipmentCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  users    UserEquipment[]
+}
+
+model UserEquipment {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  itemId    String   @db.Uuid
+  checked   Boolean  @default(false)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item EquipmentItem  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+  @@map("user_equipment")
 }

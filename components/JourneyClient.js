@@ -40,8 +40,8 @@ function JourneyCard({ item, index, isOpen, onToggle }) {
               <div key={idx} className={styles.mountainItem}>
                 <MountainIcon />
                 <span className={styles.mountainName}>{m.name}</span>
-                <span className={`${styles.mountainStatus} ${styles[m.status.toLowerCase()]}`}>
-                  {m.status}
+                <span className={`${styles.mountainStatus} ${styles[m.journeyStatus?.toLowerCase()]}`}>
+                  {m.journeyStatus}
                 </span>
               </div>
             ))}

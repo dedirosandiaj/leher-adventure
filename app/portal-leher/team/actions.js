@@ -57,7 +57,7 @@ export async function addTeamMember(prevState, formData) {
   }
 
   try {
-    await prisma.teamMember.create({ data: { name, ig, photo } });
+    await prisma.user.create({ data: { name, ig, photo, isTeam: true } });
     console.log('Team member created with photo:', photo);
   } catch (err) {
     console.error('Error creating team member:', err);
@@ -79,7 +79,7 @@ export async function updateTeamMember(prevState, formData) {
   if (!id || !name || !ig) return { error: 'ID, nama, dan Instagram wajib diisi.' };
 
   // Get current member data untuk hapus foto lama
-  const currentMember = await prisma.teamMember.findUnique({ where: { id } });
+  const currentMember = await prisma.user.findUnique({ where: { id } });
 
   let photo = existingPhoto || null;
   if (photoFile && photoFile.size > 0) {
@@ -99,7 +99,7 @@ export async function updateTeamMember(prevState, formData) {
     }
   }
 
-  await prisma.teamMember.update({ where: { id }, data: { name, ig, photo } });
+  await prisma.user.update({ where: { id }, data: { name, ig, photo } });
   revalidatePath('/');
   revalidatePath('/portal-leher/team');
   return { success: 'Anggota tim berhasil diupdate!' };
@@ -107,7 +107,7 @@ export async function updateTeamMember(prevState, formData) {
 
 export async function deleteTeamMember(id) {
   // Get member data untuk hapus file dari S3
-  const member = await prisma.teamMember.findUnique({ where: { id } });
+  const member = await prisma.user.findUnique({ where: { id } });
   
   if (member?.photo) {
     // Hapus file dari S3
@@ -122,7 +122,7 @@ export async function deleteTeamMember(id) {
     }
   }
   
-  await prisma.teamMember.delete({ where: { id } });
+  await prisma.user.delete({ where: { id } });
   revalidatePath('/');
   revalidatePath('/portal-leher/team');
   return { success: 'Anggota tim berhasil dihapus!' };

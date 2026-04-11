@@ -7,21 +7,37 @@ import bcrypt from 'bcryptjs';
 import { deleteFromS3, getKeyFromUrl } from '@/lib/s3';
 
 export async function getAllUsers() {
-  const users = await prisma.admin.findMany({
-    orderBy: { id: 'asc' }
+  const users = await prisma.user.findMany({
+    orderBy: { createdAt: 'asc' }
   });
   return users;
 }
 
 export async function addUser(prevState, formData) {
+  // Debug: log semua entries di formData
+  console.log('addUser - formData entries:');
+  for (const [key, value] of formData.entries()) {
+    console.log(`  ${key}: ${value}`);
+  }
+  
   const username = formData.get('username')?.trim();
+  const name = formData.get('name')?.trim();
+  const email = formData.get('email')?.trim();
   const role = formData.get('role') || 'member';
 
+  console.log('addUser parsed:', { username, name, email, role });
+
   if (!username) return { error: 'Username wajib diisi.' };
+  if (!name) return { error: 'Nama wajib diisi.' };
+  if (!email) return { error: 'Email wajib diisi.' };
 
   // Check if username already exists
-  const existing = await prisma.admin.findUnique({ where: { username } });
+  const existing = await prisma.user.findUnique({ where: { username } });
   if (existing) return { error: 'Username sudah digunakan.' };
+
+  // Check if email already exists
+  const existingEmail = await prisma.user.findUnique({ where: { email } });
+  if (existingEmail) return { error: 'Email sudah digunakan.' };
 
   // Default password based on role
   const defaultPassword = role === 'admin' ? 'Passw0rdAdmin' : 'Passw0rdMember';
@@ -30,20 +46,16 @@ export async function addUser(prevState, formData) {
   const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
   // Create user
-  await prisma.admin.create({
-    data: { username, password: hashedPassword, role }
+  await prisma.user.create({
+    data: { 
+      username, 
+      name,
+      email,
+      password: hashedPassword, 
+      role: role.toUpperCase(),
+      isTeam: role === 'member'
+    }
   });
-
-  // If role is member, auto-create TeamMember entry
-  if (role === 'member') {
-    await prisma.teamMember.create({
-      data: {
-        name: username,
-        ig: username,
-        photo: null
-      }
-    });
-  }
 
   revalidatePath('/portal-leher/kelola-user');
   revalidatePath('/portal-leher/team');
@@ -54,22 +66,33 @@ export async function addUser(prevState, formData) {
 export async function updateUser(prevState, formData) {
   const id = formData.get('id');
   const username = formData.get('username')?.trim();
+  const name = formData.get('name')?.trim();
+  const email = formData.get('email')?.trim();
   const password = formData.get('password');
   const role = formData.get('role');
 
   if (!id) return { error: 'ID user wajib diisi.' };
   if (!username) return { error: 'Username wajib diisi.' };
+  if (!name) return { error: 'Nama wajib diisi.' };
+  if (!email) return { error: 'Email wajib diisi.' };
 
   // Get current user data
-  const currentUser = await prisma.admin.findUnique({ where: { id: parseInt(id) } });
+  const currentUser = await prisma.user.findUnique({ where: { id } });
   if (!currentUser) return { error: 'User tidak ditemukan.' };
 
   // Check if username already exists (excluding current user)
-  const allUsers = await prisma.admin.findMany();
-  const existing = allUsers.find(u => u.username === username && u.id !== parseInt(id));
-  if (existing) return { error: 'Username sudah digunakan oleh user lain.' };
+  if (username !== currentUser.username) {
+    const existing = await prisma.user.findUnique({ where: { username } });
+    if (existing) return { error: 'Username sudah digunakan oleh user lain.' };
+  }
 
-  const data = { username, role };
+  // Check if email already exists (excluding current user)
+  if (email !== currentUser.email) {
+    const existingEmail = await prisma.user.findUnique({ where: { email } });
+    if (existingEmail) return { error: 'Email sudah digunakan oleh user lain.' };
+  }
+
+  const data = { username, name, email, role };
   
   // Only update password if provided
   if (password && password.length > 0) {
@@ -77,53 +100,11 @@ export async function updateUser(prevState, formData) {
     data.password = await bcrypt.hash(password, 10);
   }
 
-  // Update Admin
-  await prisma.admin.update({
-    where: { id: parseInt(id) },
+  // Update user
+  await prisma.user.update({
+    where: { id },
     data
   });
-
-  // Sync TeamMember if user is/was a member
-  if (currentUser.role === 'member' || role === 'member') {
-    const teamMember = await prisma.teamMember.findFirst({
-      where: { ig: currentUser.username }
-    });
-
-    if (teamMember) {
-      // Update ig in TeamMember if username changed
-      if (currentUser.username !== username) {
-        await prisma.teamMember.update({
-          where: { id: teamMember.id },
-          data: { ig: username }
-        });
-      }
-      
-      // If role changed from member to admin, delete from TeamMember
-      if (currentUser.role === 'member' && role === 'admin') {
-        // Delete photo from S3 if exists
-        if (teamMember.photo) {
-          const key = getKeyFromUrl(teamMember.photo);
-          if (key) {
-            try {
-              await deleteFromS3(key);
-            } catch (err) {
-              console.error('Error deleting photo from S3:', err);
-            }
-          }
-        }
-        await prisma.teamMember.delete({ where: { id: teamMember.id } });
-      }
-    } else if (currentUser.role === 'admin' && role === 'member') {
-      // If role changed from admin to member, create TeamMember
-      await prisma.teamMember.create({
-        data: {
-          name: username,
-          ig: username,
-          photo: null
-        }
-      });
-    }
-  }
 
   revalidatePath('/portal-leher/kelola-user');
   revalidatePath('/portal-leher/team');
@@ -137,41 +118,27 @@ export async function deleteUser(id) {
   // Don't allow deleting yourself
   const cookieStore = await cookies();
   const currentAdminId = cookieStore.get('adminId')?.value;
-  if (currentAdminId && parseInt(currentAdminId) === parseInt(id)) {
+  if (currentAdminId && currentAdminId === id) {
     return { error: 'Tidak bisa menghapus akun sendiri.' };
   }
 
   // Get user info before delete
-  const user = await prisma.admin.findUnique({ where: { id: parseInt(id) } });
+  const user = await prisma.user.findUnique({ where: { id } });
   
-  // If deleted user was member, delete from TeamMember and S3 photo
-  if (user?.role === 'member') {
-    const teamMember = await prisma.teamMember.findFirst({
-      where: { ig: user.username }
-    });
-    
-    if (teamMember) {
-      // Delete photo from S3 if exists
-      if (teamMember.photo) {
-        const key = getKeyFromUrl(teamMember.photo);
-        if (key) {
-          try {
-            await deleteFromS3(key);
-          } catch (err) {
-            console.error('Error deleting photo from S3:', err);
-          }
-        }
+  // Delete photo from S3 if exists
+  if (user?.photo) {
+    const key = getKeyFromUrl(user.photo);
+    if (key) {
+      try {
+        await deleteFromS3(key);
+      } catch (err) {
+        console.error('Error deleting photo from S3:', err);
       }
-      
-      // Delete from TeamMember
-      await prisma.teamMember.delete({
-        where: { id: teamMember.id }
-      });
     }
   }
   
-  // Delete from Admin
-  await prisma.admin.delete({ where: { id: parseInt(id) } });
+  // Delete user
+  await prisma.user.delete({ where: { id } });
 
   revalidatePath('/portal-leher/kelola-user');
   revalidatePath('/portal-leher/team');
@@ -184,8 +151,8 @@ export async function getCurrentAdmin() {
   const adminId = cookieStore.get('adminId')?.value;
   if (!adminId) return null;
   
-  const admin = await prisma.admin.findUnique({
-    where: { id: parseInt(adminId) }
+  const admin = await prisma.user.findUnique({
+    where: { id: adminId }
   });
   return admin;
 }

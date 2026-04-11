@@ -198,3 +198,345 @@
   background: rgba(231, 76, 60, 0.2);
   transform: scale(0.98);
 }
+
+/* Join Button */
+.joinButton {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+}
+
+.joinButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.joinButton.disabled {
+  background: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.5);
+  cursor: not-allowed;
+}
+
+.joinButton.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Registered Badge */
+.registeredBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(39, 174, 96, 0.2);
+  color: #2ecc71;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modalHeader h3 {
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modalBody {
+  padding: 1.25rem;
+}
+
+.journeyInfo {
+  background: rgba(43, 77, 89, 0.1);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.registrationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.formGroup label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.formGroup input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: var(--secondary);
+}
+
+.formGroup small {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  color: #666;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submitBtn {
+  flex: 1;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.success {
+  background: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+/* Approved Actions */
+.approvedActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.approvedBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(39, 174, 96, 0.2);
+  color: #2ecc71;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.expenseBtn {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.expenseBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Expense Modal */
+.expenseModal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.expenseModal .modalBody {
+  overflow-y: auto;
+  flex: 1;
+  padding: 1.25rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.expenseSummary {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.summaryItem:last-child {
+  border-bottom: none;
+}
+
+.summaryItem.highlight {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  margin: 0.5rem -1rem -1rem -1rem;
+  padding: 1rem;
+  border-radius: 0 0 12px 12px;
+}
+
+.summaryItem.highlight .summaryLabel,
+.summaryItem.highlight .summaryValue {
+  color: white;
+  font-weight: 600;
+}
+
+.summaryLabel {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.expenseList {
+  margin-top: 1rem;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.expenseList h4 {
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+.expenseItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.expenseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.expenseTitle {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.expenseCategory {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.expenseAmount {
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.noExpense {
+  text-align: center;
+  padding: 1.5rem;
+  color: #888;
+  background: #f8f9fa;
+  border-radius: 8px;
+}

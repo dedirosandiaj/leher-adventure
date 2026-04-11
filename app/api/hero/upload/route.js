@@ -41,7 +41,14 @@ export async function POST(request) {
     // Order berdasarkan timestamp WIB (terbaru di atas)
     const order = getWIBTimestamp();
     
-    await prisma.heroSlide.create({ data: { image: url, order } });
+    await prisma.media.create({ 
+      data: { 
+        url: url, 
+        order: order,
+        section: 'HERO',
+        type: 'IMAGE'
+      } 
+    });
     
     // Revalidate cache
     revalidatePath('/');

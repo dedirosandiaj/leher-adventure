@@ -15,8 +15,34 @@ function getWIBTimestamp() {
 export async function POST(request) {
   try {
     const formData = await request.formData();
-    const imageFile = formData.get('imageFile');
+    const type = formData.get('type');
     const title = formData.get('title')?.trim() || 'Gambar';
+    
+    // Handle VIDEO type
+    if (type === 'VIDEO') {
+      const url = formData.get('url')?.trim();
+      if (!url) {
+        return NextResponse.json({ error: 'Video ID wajib diisi.' }, { status: 400 });
+      }
+      
+      await prisma.media.create({
+        data: {
+          type: 'VIDEO',
+          title: title || 'Video',
+          url: url,
+          section: 'GALLERY',
+          thumbnail: null
+        }
+      });
+      
+      revalidatePath('/');
+      revalidatePath('/portal-leher/gallery');
+      
+      return NextResponse.json({ success: 'Video berhasil ditambahkan!' });
+    }
+    
+    // Handle IMAGE type (default)
+    const imageFile = formData.get('imageFile');
     
     if (!imageFile || imageFile.size === 0) {
       return NextResponse.json({ error: 'File gambar wajib diupload.' }, { status: 400 });
@@ -39,11 +65,12 @@ export async function POST(request) {
     const imageUrl = await uploadToS3(compressedBuffer, key, 'image/webp');
     
     // Save to database
-    await prisma.gallery.create({
+    await prisma.media.create({
       data: {
-        type: 'image',
+        type: 'IMAGE',
         title,
-        image: imageUrl
+        url: imageUrl,
+        section: 'GALLERY'
       }
     });
     
@@ -53,6 +80,6 @@ export async function POST(request) {
     return NextResponse.json({ success: 'Item galeri berhasil ditambahkan!' });
   } catch (error) {
     console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Gagal upload gambar. Coba lagi.' }, { status: 500 });
+    return NextResponse.json({ error: 'Gagal upload. Coba lagi.' }, { status: 500 });
   }
 }

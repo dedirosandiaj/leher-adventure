@@ -9,7 +9,10 @@ export const revalidate = 0;
 
 export default async function TeamAdminPage() {
   unstable_noStore();
-  const members = await prisma.teamMember.findMany({ orderBy: { order: 'asc' } });
+  const members = await prisma.user.findMany({ 
+    where: { isTeam: true },
+    orderBy: { createdAt: 'asc' } 
+  });
   
   // Convert photo URLs to presigned URLs for private S3 bucket
   const membersWithPresignedPhotos = await Promise.all(

@@ -11,8 +11,8 @@ const DEFAULT_SLIDES = [
 ];
 
 const DEFAULT_TEXT = {
-  title_line1: 'Selamat Datang di',
-  title_line2: 'Leher Adventure',
+  titleLine1: 'Selamat Datang di',
+  titleLine2: 'Leher Adventure',
   description: 'Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.'
 };
 
@@ -47,7 +47,7 @@ export default function Hero({ slides: propSlides, heroText }) {
       ))}
       <div className={styles.overlay}></div>
       <div className={`${styles.content} container`}>
-        <h1 className={styles.title}>{text?.title_line1}<br /><span>{text?.title_line2}</span></h1>
+        <h1 className={styles.title}>{text?.titleLine1}<br /><span>{text?.titleLine2}</span></h1>
         <p className={styles.subtitle}>{text?.description}</p>
         <div className={styles.actions}>
           <a href="#tentang-kami" className="btn btn-primary">Mulai Petualangan</a>

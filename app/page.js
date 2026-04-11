@@ -12,8 +12,8 @@ import Footer from '@/components/Footer';
 async function getPresignedImages(items, imageField = 'image') {
   return Promise.all(
     items.map(async (item) => {
-      // Skip videos (image field contains YouTube video ID, not S3 URL)
-      if (item.type === 'video') return item;
+      // Skip videos (url field contains YouTube video ID, not S3 URL)
+      if (item.type === 'VIDEO') return item;
       
       const imageUrl = item[imageField];
       if (!imageUrl) return item;
@@ -40,16 +40,16 @@ export default async function Home() {
 
   try {
     const [galleryData, heroSlidesData, heroTextData, aboutDataResult] = await Promise.all([
-      prisma.gallery.findMany({ orderBy: { id: 'desc' } }),
-      prisma.heroSlide.findMany({ orderBy: { order: 'desc' } }),
+      prisma.media.findMany({ where: { section: 'GALLERY' }, orderBy: { createdAt: 'desc' } }),
+      prisma.media.findMany({ where: { section: 'HERO' }, orderBy: { order: 'desc' } }),
       prisma.heroText.findFirst(),
       prisma.about.findFirst(),
     ]);
     
     // Convert to presigned URLs for private S3 bucket
-    galleryItems = await getPresignedImages(galleryData, 'image');
-    const heroSlidesWithUrls = await getPresignedImages(heroSlidesData, 'image');
-    heroSlides = heroSlidesWithUrls.map(s => s.image);
+    galleryItems = await getPresignedImages(galleryData, 'url');
+    const heroSlidesWithUrls = await getPresignedImages(heroSlidesData, 'url');
+    heroSlides = heroSlidesWithUrls.map(s => s.url);
     heroText = heroTextData;
     aboutData = aboutDataResult;
   } catch (error) {

@@ -17,7 +17,8 @@ const UserIcon = () => (
 );
 
 function TeamCard({ member }) {
-  const igUsername = member.ig?.replace('@', '') || '';
+  // Fallback ke username jika ig kosong
+  const igUsername = member.ig?.replace('@', '') || member.username || '';
   
   return (
     <div className={styles.card}>

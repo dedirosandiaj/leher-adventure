@@ -43,7 +43,7 @@
   transition: var(--transition);
   border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
-  background-color: #000; /* Black background behind video while loading */
+  background-color: #000;
 }
 
 .mediaItem:hover {

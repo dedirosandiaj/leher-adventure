@@ -16,14 +16,20 @@ export default async function MemberProfile() {
   const cookieStore = await cookies();
   const memberId = cookieStore.get('memberId')?.value;
   
-  const member = await prisma.admin.findUnique({
-    where: { id: parseInt(memberId) }
+  const member = await prisma.user.findUnique({
+    where: { id: memberId }
   });
   
-  // Get team member data
-  const teamMember = await prisma.teamMember.findFirst({
-    where: { ig: member?.username }
+  console.log('Profil page - member:', member);
+  
+  // Get team member data - cari yang ig-nya sama dengan username member
+  // (ig di team member = username instagram = username login member)
+  const teamMember = await prisma.user.findFirst({
+    where: { ig: member?.username, isTeam: true }
   });
+  
+  console.log('Profil page - teamMember:', teamMember);
+  console.log('Profil page - searching with ig:', member?.username);
   
   // Convert photo to presigned URL if exists
   let photoUrl = teamMember?.photo;

@@ -53,7 +53,7 @@ export default function ProfileForm({ member, teamMember, photoUrl, updateAction
           type="text" 
           name="name" 
           placeholder="Masukkan nama lengkap"
-          defaultValue={teamMember?.name || ''}
+          defaultValue={teamMember?.name || member?.name || ''}
         />
       </div>
 

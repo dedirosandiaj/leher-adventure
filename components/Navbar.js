@@ -13,6 +13,10 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={`${styles.container} container`}>
+        {/* Left spacer untuk balance di mobile */}
+        <div className={styles.leftSpacer}></div>
+        
+        {/* Logo */}
         <div className={styles.logo}>
           <Link href="/" onClick={closeMenu}>
             <Image

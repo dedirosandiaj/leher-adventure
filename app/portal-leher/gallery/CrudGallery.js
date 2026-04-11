@@ -1,8 +1,9 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { useActionState } from 'react';
 import Cropper from 'react-cropper';
 import 'cropperjs/src/css/cropper.css';
-import { deleteGalleryItem } from './actions';
+import { addGalleryItem, deleteGalleryItem } from './actions';
 import ConfirmModal from '../components/ConfirmModal';
 import styles from '../crud.module.css';
 
@@ -19,7 +20,7 @@ const ASPECT_RATIOS = [
 export default function CrudGallery({ items }) {
   const [state, setState] = useState(null);
   const [isPending, setIsPending] = useState(false);
-  const [mediaType, setMediaType] = useState('image');
+  const [mediaType, setMediaType] = useState('IMAGE');
   const [previewUrl, setPreviewUrl] = useState(null);
   const [croppedImage, setCroppedImage] = useState(null);
   const [aspectRatio, setAspectRatio] = useState(ASPECT_RATIOS[1]); // Default 4:3
@@ -35,7 +36,7 @@ export default function CrudGallery({ items }) {
   useEffect(() => {
     if (state?.success) {
       // Reset semua state
-      setMediaType('image');
+      setMediaType('IMAGE');
       setPreviewUrl(null);
       setCroppedImage(null);
       setAspectRatio(ASPECT_RATIOS[1]);
@@ -75,7 +76,7 @@ export default function CrudGallery({ items }) {
   };
 
   const handleCancel = () => {
-    setMediaType('image');
+    setMediaType('IMAGE');
     setPreviewUrl(null);
     setCroppedImage(null);
     setAspectRatio(ASPECT_RATIOS[1]);
@@ -115,24 +116,18 @@ export default function CrudGallery({ items }) {
     setModalOpen(true);
   };
 
-  const handleImageSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsPending(true);
     setState(null);
     
     try {
-      const formData = new FormData();
-      formData.append('title', 'Gambar');
+      const formData = new FormData(e.target);
       
-      // Gunakan gambar yang sudah di-crop jika ada
-      if (croppedImage) {
+      // For IMAGE type, use cropped image if available
+      if (mediaType === 'IMAGE' && croppedImage) {
         const croppedFile = dataURLtoFile(croppedImage, 'gallery-image.jpg');
-        formData.append('imageFile', croppedFile);
-      } else if (previewUrl) {
-        const fileInput = fileInputRef.current;
-        if (fileInput?.files[0]) {
-          formData.append('imageFile', fileInput.files[0]);
-        }
+        formData.set('imageFile', croppedFile);
       }
       
       const response = await fetch('/api/portal-leher/gallery/upload', {
@@ -167,7 +162,7 @@ export default function CrudGallery({ items }) {
 
       <div className={styles.formCard}>
         <h2 className={styles.sectionTitle}>Tambah Item Galeri</h2>
-        <form ref={formRef} onSubmit={handleImageSubmit} className={styles.form}>
+        <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formRow}>
             <div className={styles.inputGroup}>
               <label>Tipe Media</label>
@@ -177,13 +172,13 @@ export default function CrudGallery({ items }) {
                 onChange={handleTypeChange}
                 required
               >
-                <option value="image">Foto (Upload File)</option>
-                <option value="video">Video (YouTube URL)</option>
+                <option value="IMAGE">Foto (Upload File)</option>
+                <option value="VIDEO">Video (YouTube URL)</option>
               </select>
             </div>
           </div>
           
-          {mediaType === 'image' ? (
+          {mediaType === 'IMAGE' ? (
             <div className={styles.inputGroup} style={{marginTop:'1rem'}}>
               <label>Upload Gambar</label>
               {!previewUrl && (
@@ -270,7 +265,7 @@ export default function CrudGallery({ items }) {
           {state?.error && <p className={styles.error}>{state.error}</p>}
           {state?.success && <p className={styles.success}>{state.success}</p>}
           <div className={styles.buttonGroup}>
-            <button type="submit" className={styles.addBtn} disabled={isPending || (mediaType === 'image' && !croppedImage && !previewUrl)}>
+            <button type="submit" className={styles.addBtn} disabled={isPending || (mediaType === 'IMAGE' && !croppedImage && !previewUrl)}>
               {isPending ? 'Menyimpan...' : 'Tambah ke Galeri'}
             </button>
             <button type="button" className={styles.cancelBtn} onClick={handleCancel}>Batal</button>
@@ -287,17 +282,39 @@ export default function CrudGallery({ items }) {
             {items.map(item => (
               <div key={item.id} className={styles.galleryThumb}>
                 <img
-                  src={item.type === 'video' ? (item.thumbnail || `https://img.youtube.com/vi/${item.image}/0.jpg`) : item.image}
+                  src={item.type === 'VIDEO' ? (item.thumbnail || `https://img.youtube.com/vi/${item.url}/0.jpg`) : item.url}
                   alt="Gallery item"
                 />
-                <div className={styles.thumbLabel}>{item.type === 'video' ? '▶ Video' : '🖼 Foto'}</div>
+                <div className={styles.thumbLabel}>
+                  {item.type === 'VIDEO' ? (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                      Video
+                    </>
+                  ) : (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                      Foto
+                    </>
+                  )}
+                </div>
                 <div className={styles.galleryActions}>
                   <button 
                     type="button" 
                     className={styles.deleteOverlay}
                     onClick={() => openDeleteModal(item)}
+                    title="Hapus"
                   >
-                    ✕
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                   </button>
                 </div>
               </div>

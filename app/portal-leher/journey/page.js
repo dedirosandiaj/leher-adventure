@@ -8,6 +8,10 @@ export const revalidate = 0;
 
 export default async function JourneyAdminPage() {
   unstable_noStore();
-  const mountains = await prisma.mountain.findMany();
-  return <CrudJourney mountains={mountains} />;
+  // Fetch journeys with mountain data
+  const journeys = await prisma.journey.findMany({
+    include: { mountain: true },
+    orderBy: { year: 'desc' }
+  });
+  return <CrudJourney journeys={journeys} />;
 }

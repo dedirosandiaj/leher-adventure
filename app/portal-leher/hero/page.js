@@ -9,16 +9,19 @@ export const revalidate = 0;
 export default async function HeroAdminPage() {
   unstable_noStore();
   // Terbaru di atas (descending by order/timestamp)
-  const slides = await prisma.heroSlide.findMany({ orderBy: { order: 'desc' } });
+  const slides = await prisma.media.findMany({ 
+    where: { section: 'HERO' },
+    orderBy: { order: 'desc' } 
+  });
   
   // Convert image URLs to presigned URLs for private bucket access
   const slidesWithPresignedUrls = await Promise.all(
     slides.map(async (slide) => {
-      const key = getKeyFromUrl(slide.image);
+      const key = getKeyFromUrl(slide.url);
       if (key) {
         try {
           const presignedUrl = await getPresignedUrl(key, 86400); // 24 hours
-          return { ...slide, image: presignedUrl };
+          return { ...slide, url: presignedUrl };
         } catch (err) {
           console.error('Error generating presigned URL:', err);
           return slide;

@@ -39,11 +39,12 @@ export async function POST(request) {
     const imageUrl = await uploadToS3(compressedBuffer, key, 'image/webp');
     
     // Save to database
-    await prisma.gallery.create({
+    await prisma.media.create({
       data: {
-        type: 'image',
+        type: 'IMAGE',
+        section: 'GALLERY',
         title,
-        image: imageUrl
+        url: imageUrl
       }
     });
     

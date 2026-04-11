@@ -13,14 +13,14 @@ export async function loginMember(prevState, formData) {
     return { error: 'Username dan password wajib diisi.' };
   }
 
-  const user = await prisma.admin.findUnique({ where: { username } });
+  const user = await prisma.user.findUnique({ where: { username } });
   
   if (!user) {
     return { error: 'Username atau password salah.' };
   }
 
-  // Only allow member role
-  if (user.role !== 'member') {
+  // Only allow MEMBER role
+  if (user.role !== 'MEMBER') {
     return { error: 'Akses khusus member. Silakan login di portal admin.' };
   }
 
@@ -31,7 +31,7 @@ export async function loginMember(prevState, formData) {
 
   // Set cookie
   const cookieStore = await cookies();
-  cookieStore.set('memberId', user.id.toString(), {
+  cookieStore.set('memberId', user.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
@@ -53,8 +53,8 @@ export async function getCurrentMember() {
   const memberId = cookieStore.get('memberId')?.value;
   if (!memberId) return null;
   
-  const member = await prisma.admin.findUnique({
-    where: { id: parseInt(memberId) }
+  const member = await prisma.user.findUnique({
+    where: { id: memberId }
   });
   
   return member;

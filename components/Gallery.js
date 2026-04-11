@@ -16,20 +16,24 @@ export default function Gallery({ items }) {
         <div className={styles.grid}>
           <div className={styles.mediaGrid}>
             {mediaList.map((media, index) => {
-              // Get thumbnail URL
-              const thumbnailUrl = media.type === 'video' 
-                ? `https://img.youtube.com/vi/${media.image}/0.jpg`
-                : media.image;
+              const thumbnailUrl = media.type === 'VIDEO' 
+                ? `https://img.youtube.com/vi/${media.url}/0.jpg`
+                : media.thumbnail || media.url;
               
               return (
                 <div 
-                  key={index} 
+                  key={media.id || index} 
                   className={styles.mediaItem} 
                   onClick={() => setActiveMedia(media)}
                 >
-                  <img src={thumbnailUrl} alt={media.title || `Galeri Leher Adventure ${index + 1}`} loading="lazy" />
+                  <img 
+                    src={thumbnailUrl} 
+                    alt={media.title || `Galeri Leher Adventure ${index + 1}`} 
+                    loading="lazy"
+                    decoding="async"
+                  />
                   
-                  {media.type === 'video' && (
+                  {media.type === 'VIDEO' && (
                     <div className={styles.playOverlay}>
                       <svg viewBox="0 0 24 24" width="36" height="36" fill="white">
                          <path d="M8 5v14l11-7z" />
@@ -49,18 +53,18 @@ export default function Gallery({ items }) {
             <button className={styles.closeBtn} onClick={() => setActiveMedia(null)}>
                &#x2715;
             </button>
-            {activeMedia.type === 'video' || activeMedia.video_url ? (
+            {activeMedia.type === 'VIDEO' ? (
               <iframe 
                 width="100%" 
                 height="100%" 
-                src={`https://www.youtube.com/embed/${activeMedia.video_url || activeMedia.image}`}
+                src={`https://www.youtube.com/embed/${activeMedia.url}`}
                 title="Video" 
                 frameBorder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowFullScreen>
               </iframe>
             ) : (
-              <img src={activeMedia.image} alt={activeMedia.title || 'Galeri Besar'} />
+              <img src={activeMedia.url} alt={activeMedia.title || 'Galeri Besar'} />
             )}
           </div>
         </div>

@@ -10,8 +10,8 @@ export async function getHeroText() {
       // Buat default jika belum ada
       return await prisma.heroText.create({
         data: {
-          title_line1: 'Selamat Datang di',
-          title_line2: 'Leher Adventure',
+          titleLine1: 'Selamat Datang di',
+          titleLine2: 'Leher Adventure',
           description: 'Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.',
         },
       });
@@ -21,19 +21,19 @@ export async function getHeroText() {
     // Jika tabel belum ada, return default value
     console.error('Error fetching hero text:', error);
     return {
-      title_line1: 'Selamat Datang di',
-      title_line2: 'Leher Adventure',
+      titleLine1: 'Selamat Datang di',
+      titleLine2: 'Leher Adventure',
       description: 'Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.',
     };
   }
 }
 
 export async function updateHeroText(prevState, formData) {
-  const title_line1 = formData.get('title_line1')?.trim();
-  const title_line2 = formData.get('title_line2')?.trim();
+  const titleLine1 = formData.get('title_line1')?.trim();
+  const titleLine2 = formData.get('title_line2')?.trim();
   const description = formData.get('description')?.trim();
 
-  if (!title_line1 || !title_line2 || !description) {
+  if (!titleLine1 || !titleLine2 || !description) {
     return { error: 'Semua field wajib diisi.' };
   }
 
@@ -43,11 +43,11 @@ export async function updateHeroText(prevState, formData) {
     if (existing) {
       await prisma.heroText.update({
         where: { id: existing.id },
-        data: { title_line1, title_line2, description },
+        data: { titleLine1, titleLine2, description },
       });
     } else {
       await prisma.heroText.create({
-        data: { title_line1, title_line2, description },
+        data: { titleLine1, titleLine2, description },
       });
     }
     

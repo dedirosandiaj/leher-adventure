@@ -3,6 +3,18 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
+// Helper to map status string to JourneyStatus enum
+function mapStatus(status) {
+  const statusMap = {
+    'Rencana': 'PLANNED',
+    'Berlangsung': 'ONGOING',
+    'Dalam Perjalanan': 'ONGOING',
+    'Selesai': 'COMPLETED',
+    'Dibatalkan': 'CANCELLED'
+  };
+  return statusMap[status] || 'PLANNED';
+}
+
 export async function addMountain(prevState, formData) {
   const name = formData.get('name')?.trim();
   const year = parseInt(formData.get('year'));
@@ -15,15 +27,35 @@ export async function addMountain(prevState, formData) {
 
   try {
     if (id) {
-      // Update
+      // Update - update both Mountain name and Journey year/status
       await prisma.mountain.update({
-        where: { id: parseInt(id) },
-        data: { name, year, status },
+        where: { id },
+        data: { name },
       });
+      
+      // Update related journey
+      const journey = await prisma.journey.findFirst({
+        where: { mountainId: id }
+      });
+      
+      if (journey) {
+        await prisma.journey.update({
+          where: { id: journey.id },
+          data: { year, status: mapStatus(status) },
+        });
+      }
     } else {
-      // Create
-      await prisma.mountain.create({
-        data: { name, year, status },
+      // Create - create Mountain and Journey
+      const mountain = await prisma.mountain.create({
+        data: { name },
+      });
+      
+      await prisma.journey.create({
+        data: {
+          mountainId: mountain.id,
+          year,
+          status: mapStatus(status),
+        },
       });
     }
     
@@ -38,6 +70,8 @@ export async function addMountain(prevState, formData) {
 
 export async function deleteMountain(id) {
   try {
+    // Delete related journeys first (cascade will handle this, but being explicit)
+    await prisma.journey.deleteMany({ where: { mountainId: id } });
     await prisma.mountain.delete({ where: { id } });
     revalidatePath('/');
     revalidatePath('/portal-leher/journey');
@@ -50,12 +84,20 @@ export async function deleteMountain(id) {
 
 export async function moveMountain(id, newStatus) {
   try {
-    const mountainId = parseInt(id);
-    console.log('Moving mountain', mountainId, 'to status', newStatus);
-    await prisma.mountain.update({
-      where: { id: mountainId },
-      data: { status: newStatus },
+    console.log('Moving mountain', id, 'to status', newStatus);
+    
+    // Update journey status
+    const journey = await prisma.journey.findFirst({
+      where: { mountainId: id }
     });
+    
+    if (journey) {
+      await prisma.journey.update({
+        where: { id: journey.id },
+        data: { status: mapStatus(newStatus) },
+      });
+    }
+    
     revalidatePath('/');
     revalidatePath('/portal-leher/journey');
     return { success: 'Status diperbarui!' };

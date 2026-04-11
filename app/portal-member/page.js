@@ -1,30 +1,43 @@
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { unstable_noStore } from 'next/cache';
 import styles from './home.module.css';
+import JourneyCard from './JourneyCard';
+import { getEquipmentProgress, checkRegistration } from './actions';
+
+// Disable cache untuk selalu fetch data terbaru
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function MemberHome() {
+  unstable_noStore();
+  
   const cookieStore = await cookies();
   const memberId = cookieStore.get('memberId')?.value;
   
   let member = null;
   let teamMember = null;
   if (memberId) {
-    member = await prisma.admin.findUnique({
-      where: { id: parseInt(memberId) }
+    member = await prisma.user.findUnique({
+      where: { id: memberId }
     });
     
     // Get team member data for Instagram username
-    teamMember = await prisma.teamMember.findFirst({
-      where: { ig: member?.username }
+    teamMember = await prisma.user.findFirst({
+      where: { ig: member?.username, isTeam: true }
     });
   }
 
   // Use teamMember's name or fallback to admin username
   const displayName = teamMember?.name || member?.username || 'user';
   
-  // Get upcoming mountains (status = Rencana)
-  const upcomingMountains = await prisma.mountain.findMany({
-    where: { status: 'Rencana' },
+  // Get equipment progress
+  const { progress: equipmentProgress } = await getEquipmentProgress();
+  
+  // Get upcoming journeys (status = PLANNED)
+  const upcomingJourneys = await prisma.journey.findMany({
+    where: { status: 'PLANNED' },
+    include: { mountain: true },
     orderBy: { year: 'asc' }
   });
 
@@ -36,18 +49,22 @@ export default async function MemberHome() {
         <p className={styles.username}>{displayName}</p>
       </header>
       
-      {/* Upcoming Mountains */}
-      {upcomingMountains.length > 0 && (
+      {/* Upcoming Journeys */}
+      {upcomingJourneys.length > 0 && (
         <div className={styles.journeysSection}>
           <h2 className={styles.sectionTitle}>Pendakian Mendatang</h2>
           <div className={styles.journeysList}>
-            {upcomingMountains.map(mountain => (
-              <div key={mountain.id} className={styles.journeyCard}>
-                <span className={styles.journeyYear}>{mountain.year}</span>
-                <span className={styles.mountainName}>{mountain.name}</span>
-                <span className={styles.journeyStatus}>{mountain.status}</span>
-              </div>
-            ))}
+            {upcomingJourneys.map(async (journey) => {
+              const registration = await checkRegistration(journey.id);
+              return (
+                <JourneyCard 
+                  key={journey.id} 
+                  journey={journey}
+                  equipmentProgress={equipmentProgress}
+                  registrationStatus={registration?.status || null}
+                />
+              );
+            })}
           </div>
         </div>
       )}

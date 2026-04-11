@@ -241,7 +241,7 @@ export default function CrudHero({ slides }) {
           <div className={styles.galleryGrid}>
             {slides.map(slide => (
               <div key={slide.id} className={styles.galleryThumb}>
-                <img src={slide.image} alt="Hero slide" />
+                <img src={slide.url} alt="Hero slide" />
                 <div className={styles.galleryActions}>
                   <button 
                     type="button" 
