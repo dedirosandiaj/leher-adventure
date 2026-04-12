@@ -68,7 +68,7 @@ export const metadata = {
     },
   },
   verification: {
-    google: "google-site-verification-code", // Ganti dengan kode verifikasi Google Search Console
+    google: "googlee7f37e6d5b985959",
   },
 };
 
