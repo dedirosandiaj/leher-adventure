@@ -38,10 +38,11 @@ export default function Hero({ slides: propSlides, heroText }) {
         >
           <Image 
             src={src} 
-            alt={`Leher Adventure Background ${index + 1}`} 
-            fill 
+            alt={`Leher Adventure Background ${index + 1}`}
+            fill
             style={{ objectFit: 'cover' }}
             priority={index === 0}
+            unoptimized={src.startsWith('http')}
           />
         </div>
       ))}

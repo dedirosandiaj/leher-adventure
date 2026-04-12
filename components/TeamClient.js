@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import styles from './Team.module.css';
 
 const InstagramIcon = () => (
@@ -25,14 +26,15 @@ function TeamCard({ member }) {
       <div className={styles.cardInner}>
         <div className={styles.avatar}>
           {member.photo ? (
-            <img 
+            <Image 
               src={member.photo} 
               alt={member.name}
-              loading="lazy"
+              fill
+              style={{ objectFit: 'cover' }}
+              unoptimized={true}
               onError={(e) => {
                 console.error('Failed to load photo:', member.photo);
                 e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
               }}
             />
           ) : null}
