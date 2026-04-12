@@ -37,31 +37,71 @@ async function saveImageToS3(file, folder = 'team') {
 
 export async function addTeamMember(prevState, formData) {
   const name = formData.get('name')?.trim();
-  const ig = formData.get('ig')?.trim();
+  const username = formData.get('username')?.trim();
   const photoFile = formData.get('photoFile');
 
-  console.log('Adding team member:', { name, ig, photoFile: photoFile?.name, photoFileSize: photoFile?.size });
+  console.log('Adding team member:', { name, username, photoFile: photoFile?.name, photoFileSize: photoFile?.size });
 
   if (!name) return { error: 'Nama wajib diisi.' };
-  if (!ig) return { error: 'Instagram handle wajib diisi.' };
+  if (!username) return { error: 'Username Instagram wajib diisi.' };
 
-  let photo = null;
-  if (photoFile && photoFile.size > 0) {
-    try {
-      photo = await saveImageToS3(photoFile, 'team');
-      console.log('Photo uploaded to S3:', photo);
-    } catch (err) {
-      console.error('Error uploading photo:', err);
-      return { error: 'Gagal upload foto: ' + err.message };
+  // Check if username already exists
+  const existingUser = await prisma.user.findUnique({
+    where: { username }
+  });
+  
+  if (existingUser) {
+    // If user exists, just update isTeam to true
+    let photo = existingUser.photo;
+    if (photoFile && photoFile.size > 0) {
+      try {
+        photo = await saveImageToS3(photoFile, 'team');
+        console.log('Photo uploaded to S3:', photo);
+      } catch (err) {
+        console.error('Error uploading photo:', err);
+        return { error: 'Gagal upload foto: ' + err.message };
+      }
     }
-  }
+    
+    try {
+      await prisma.user.update({
+        where: { id: existingUser.id },
+        data: { name, photo, isTeam: true }
+      });
+      console.log('Existing user updated as team member');
+    } catch (err) {
+      console.error('Error updating team member:', err);
+      return { error: 'Gagal update user: ' + err.message };
+    }
+  } else {
+    // Create new team member (with placeholder email and password)
+    let photo = null;
+    if (photoFile && photoFile.size > 0) {
+      try {
+        photo = await saveImageToS3(photoFile, 'team');
+        console.log('Photo uploaded to S3:', photo);
+      } catch (err) {
+        console.error('Error uploading photo:', err);
+        return { error: 'Gagal upload foto: ' + err.message };
+      }
+    }
 
-  try {
-    await prisma.user.create({ data: { name, ig, photo, isTeam: true } });
-    console.log('Team member created with photo:', photo);
-  } catch (err) {
-    console.error('Error creating team member:', err);
-    return { error: 'Gagal simpan ke database: ' + err.message };
+    try {
+      await prisma.user.create({ 
+        data: { 
+          name, 
+          username, 
+          email: `${username}@leheradventure.placeholder`,
+          password: 'PLACEHOLDER_NOT_FOR_LOGIN',
+          photo, 
+          isTeam: true 
+        } 
+      });
+      console.log('Team member created with photo:', photo);
+    } catch (err) {
+      console.error('Error creating team member:', err);
+      return { error: 'Gagal simpan ke database: ' + err.message };
+    }
   }
   
   revalidatePath('/');
@@ -72,11 +112,11 @@ export async function addTeamMember(prevState, formData) {
 export async function updateTeamMember(prevState, formData) {
   const id = formData.get('id');
   const name = formData.get('name')?.trim();
-  const ig = formData.get('ig')?.trim();
+  const username = formData.get('username')?.trim();
   const existingPhoto = formData.get('existingPhoto');
   const photoFile = formData.get('photoFile');
 
-  if (!id || !name || !ig) return { error: 'ID, nama, dan Instagram wajib diisi.' };
+  if (!id || !name || !username) return { error: 'ID, nama, dan username wajib diisi.' };
 
   // Get current member data untuk hapus foto lama
   const currentMember = await prisma.user.findUnique({ where: { id } });
@@ -99,7 +139,7 @@ export async function updateTeamMember(prevState, formData) {
     }
   }
 
-  await prisma.user.update({ where: { id }, data: { name, ig, photo } });
+  await prisma.user.update({ where: { id }, data: { name, username, photo } });
   revalidatePath('/');
   revalidatePath('/portal-leher/team');
   return { success: 'Anggota tim berhasil diupdate!' };

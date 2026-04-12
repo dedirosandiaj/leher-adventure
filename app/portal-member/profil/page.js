@@ -22,17 +22,14 @@ export default async function MemberProfile() {
   
   console.log('Profil page - member:', member);
   
-  // Get team member data - cari yang ig-nya sama dengan username member
-  // (ig di team member = username instagram = username login member)
-  const teamMember = await prisma.user.findFirst({
-    where: { ig: member?.username, isTeam: true }
-  });
+  // Check if member is also a team member
+  // If member is a team member, they can edit their own team profile
+  const isTeamMember = member?.isTeam;
   
-  console.log('Profil page - teamMember:', teamMember);
-  console.log('Profil page - searching with ig:', member?.username);
+  console.log('Profil page - isTeamMember:', isTeamMember);
   
   // Convert photo to presigned URL if exists
-  let photoUrl = teamMember?.photo;
+  let photoUrl = member?.photo;
   if (photoUrl) {
     const key = getKeyFromUrl(photoUrl);
     if (key) {
@@ -50,7 +47,7 @@ export default async function MemberProfile() {
       
       <ProfileForm 
         member={member}
-        teamMember={teamMember}
+        isTeamMember={isTeamMember}
         photoUrl={photoUrl}
         updateAction={updateProfile}
       />

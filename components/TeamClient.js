@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from './Team.module.css';
 
 const InstagramIcon = () => (
@@ -18,11 +19,12 @@ const UserIcon = () => (
 );
 
 function TeamCard({ member }) {
-  // Fallback ke username jika ig kosong
-  const igUsername = member.ig?.replace('@', '') || member.username || '';
+  // Username is the Instagram handle
+  const igUsername = member.username || '';
+
   
   return (
-    <div className={styles.card}>
+    <Link href={`/${member.username}`} className={styles.card}>
       <div className={styles.cardInner}>
         <div className={styles.avatar}>
           {member.photo ? (
@@ -46,18 +48,20 @@ function TeamCard({ member }) {
         <div className={styles.info}>
           <h3 className={styles.name}>{member.name}</h3>
           
-          <a 
-            href={`https://instagram.com/${igUsername}`} 
-            target="_blank" 
-            rel="noopener noreferrer"
+          <span 
             className={styles.instagram}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.open(`https://instagram.com/${igUsername}`, '_blank');
+            }}
           >
             <InstagramIcon />
             <span>@{igUsername}</span>
-          </a>
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

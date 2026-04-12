@@ -34,7 +34,6 @@ async function main() {
       password: memberPassword,
       role: 'MEMBER',
       isTeam: true,
-      ig: 'dedirosandi',
     },
   });
   console.log('Created member:', member.username);

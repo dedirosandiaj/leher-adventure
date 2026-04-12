@@ -12,9 +12,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Leher Adventure | Petualangan Gunung Indonesia",
+  title: {
+    default: "Leher Adventure | Petualangan Gunung Indonesia",
+    template: "%s | Leher Adventure",
+  },
   description: "Leher Adventure - Komunitas petualangan gunung di Indonesia. Jelajahi jejak ekspedisi kami dan bergabunglah dalam petualangan berikutnya.",
-  keywords: ["Leher Adventure", "petualangan gunung", "ekspedisi Indonesia", "hiking", "mountaineering", "outdoor"],
+  keywords: ["Leher Adventure", "petualangan gunung", "ekspedisi Indonesia", "hiking", "mountaineering", "outdoor", "pendakian", "gunung Indonesia"],
   authors: [{ name: "Leher Adventure" }],
   creator: "Leher Adventure",
   publisher: "Leher Adventure",
@@ -63,6 +66,9 @@ export const metadata = {
       rel: "apple-touch-icon",
       url: "/images/logo-leher.png",
     },
+  },
+  verification: {
+    google: "google-site-verification-code", // Ganti dengan kode verifikasi Google Search Console
   },
 };
 

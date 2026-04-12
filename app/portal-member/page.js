@@ -21,15 +21,10 @@ export default async function MemberHome() {
     member = await prisma.user.findUnique({
       where: { id: memberId }
     });
-    
-    // Get team member data for Instagram username
-    teamMember = await prisma.user.findFirst({
-      where: { ig: member?.username, isTeam: true }
-    });
   }
 
-  // Use teamMember's name or fallback to admin username
-  const displayName = teamMember?.name || member?.username || 'user';
+  // Use member's name or fallback to username
+  const displayName = member?.name || member?.username || 'user';
   
   // Get equipment progress
   const { progress: equipmentProgress } = await getEquipmentProgress();

@@ -50,44 +50,22 @@ export async function updateProfile(prevState, formData) {
   });
   
   console.log('UpdateProfile - member found:', member);
-  console.log('UpdateProfile - member.username:', member?.username);
   
   if (!member) {
     return { error: 'Akses ditolak. Member tidak ditemukan.' };
   }
   
   const name = formData.get('name')?.trim();
-  const ig = formData.get('ig')?.trim();
   const photoFile = formData.get('photoFile');
   const existingPhoto = formData.get('existingPhoto');
-  
-  // Jika member ini adalah team member (isTeam=true), update langsung
-  // Jika bukan, cari team member yang ig-nya sama dengan username member
-  let teamMember = member;
-  
-  if (!member.isTeam) {
-    // Cari team member yang ig-nya sama dengan username member login
-    const searchIg = member.username || ig;
-    console.log('UpdateProfile - searching team member with ig:', searchIg);
-    teamMember = await prisma.user.findFirst({
-      where: { ig: searchIg, isTeam: true }
-    });
-    console.log('UpdateProfile - team member found:', teamMember);
-    
-    if (!teamMember) {
-      return { error: 'Data team member tidak ditemukan. Hubungi admin.' };
-    }
-  } else {
-    console.log('UpdateProfile - member is team member, updating directly');
-  }
   
   let photo = existingPhoto || null;
   
   // Handle photo upload
   if (photoFile && photoFile.size > 0) {
     // Delete old photo if exists
-    if (teamMember?.photo) {
-      const oldKey = getKeyFromUrl(teamMember.photo);
+    if (member?.photo) {
+      const oldKey = getKeyFromUrl(member.photo);
       if (oldKey) {
         try {
           await deleteFromS3(oldKey);
@@ -100,10 +78,10 @@ export async function updateProfile(prevState, formData) {
     photo = await saveImageToS3(photoFile, 'team');
   }
   
-  // Update team member data
+  // Update member data
   await prisma.user.update({
-    where: { id: teamMember.id },
-    data: { name, ig, photo }
+    where: { id: member.id },
+    data: { name, photo }
   });
   
   revalidatePath('/portal-member/profil');

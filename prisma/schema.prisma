@@ -21,7 +21,6 @@ model User {
   role      UserRole @default(MEMBER)
   phone     String?
   photo     String?
-  ig        String?
   isTeam    Boolean  @default(false)  // Tampilkan di section Team
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)

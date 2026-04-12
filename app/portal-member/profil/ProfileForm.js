@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { useActionState } from 'react';
 import styles from './profile.module.css';
 
-export default function ProfileForm({ member, teamMember, photoUrl, updateAction }) {
+export default function ProfileForm({ member, isTeamMember, photoUrl, updateAction }) {
   const [state, formAction, isPending] = useActionState(updateAction, null);
   const [previewUrl, setPreviewUrl] = useState(photoUrl);
   
-  // IG is always readonly - cannot be changed
-  const currentIg = teamMember?.ig || member?.username || '';
+  // Username is the Instagram handle
+  const username = member?.username || '';
+  const name = member?.name || '';
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -53,17 +54,17 @@ export default function ProfileForm({ member, teamMember, photoUrl, updateAction
           type="text" 
           name="name" 
           placeholder="Masukkan nama lengkap"
-          defaultValue={teamMember?.name || member?.name || ''}
+          defaultValue={name}
         />
       </div>
 
-      {/* Instagram - Readonly */}
+      {/* Username - Readonly */}
       <div className={styles.inputGroup}>
         <label>Username Instagram</label>
         <input 
           type="text" 
-          name="ig" 
-          defaultValue={currentIg}
+          name="username" 
+          defaultValue={username}
           readOnly
           className={styles.readonlyInput}
         />

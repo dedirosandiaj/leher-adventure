@@ -37,13 +37,15 @@ export default async function Home() {
   let heroSlides = [];
   let heroText = null;
   let aboutData = null;
+  let teamMembers = [];
 
   try {
-    const [galleryData, heroSlidesData, heroTextData, aboutDataResult] = await Promise.all([
+    const [galleryData, heroSlidesData, heroTextData, aboutDataResult, teamData] = await Promise.all([
       prisma.media.findMany({ where: { section: 'GALLERY' }, orderBy: { createdAt: 'desc' } }),
       prisma.media.findMany({ where: { section: 'HERO' }, orderBy: { order: 'desc' } }),
       prisma.heroText.findFirst(),
       prisma.about.findFirst(),
+      prisma.user.findMany({ where: { isTeam: true }, select: { name: true, username: true } }),
     ]);
     
     // Convert to presigned URLs for private S3 bucket
@@ -52,13 +54,37 @@ export default async function Home() {
     heroSlides = heroSlidesWithUrls.map(s => s.url);
     heroText = heroTextData;
     aboutData = aboutDataResult;
+    teamMembers = teamData;
   } catch (error) {
     console.error('Error fetching data:', error);
     // Jika tabel belum ada, gunakan default values
   }
 
+  // JSON-LD Structured Data for SEO
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Leher Adventure',
+    url: 'https://leher-adventure.org',
+    logo: 'https://leher-adventure.org/images/logo-leher.png',
+    description: 'Leher Adventure - Komunitas petualangan gunung di Indonesia. Jelajahi jejak ekspedisi kami dan bergabunglah dalam petualangan berikutnya.',
+    sameAs: [
+      'https://instagram.com/leheradventure',
+    ],
+    member: teamMembers.map(member => ({
+      '@type': 'Person',
+      name: member.name,
+      url: `https://leher-adventure.org/${member.username}`,
+      sameAs: [`https://instagram.com/${member.username}`],
+    })),
+  };
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <Hero slides={heroSlides} heroText={heroText} />
       <About aboutData={aboutData} />

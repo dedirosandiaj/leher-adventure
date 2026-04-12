@@ -20,7 +20,7 @@ export default function CrudTeam({ members }) {
                   />
                 </div>
                 <div className={styles.teamName}>{m.name}</div>
-                <div className={styles.teamIg}>{m.ig}</div>
+                <div className={styles.teamIg}>@{m.username}</div>
               </div>
             ))}
           </div>
