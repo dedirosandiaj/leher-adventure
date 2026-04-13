@@ -26,7 +26,7 @@
   justify-content: flex-start;
 }
 
-.logo a {
+.logoLink {
   display: flex;
   align-items: center;
   text-decoration: none;
@@ -34,8 +34,55 @@
   transform-style: preserve-3d;
 }
 
-.logo a img {
-  transition: filter 0.3s ease;
+.logoWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 50px;
+  overflow: hidden;
+}
+
+.logoImage {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  opacity: 0;
+  transform: translateY(-100%);
+  position: absolute;
+}
+
+.logoText {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.30rem;
+  font-weight: 1000;
+  color: var(--primary);
+  white-space: nowrap;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  opacity: 0;
+  transform: translateY(100%);
+  position: absolute;
+}
+
+/* Show logo state */
+.showLogo .logoImage {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.showLogo .logoText {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+/* Show text state */
+.showText .logoImage {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.showText .logoText {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Animasi 3D swing ke kiri dan kanan tanpa shadow */
@@ -113,22 +160,39 @@
 
 @media (max-width: 768px) {
   .container {
-    justify-content: center;
-    padding: 0 1.5rem;
+    justify-content: space-between;
+    padding: 0 1rem;
+    position: relative;
   }
   
   .leftSpacer {
     display: block;
-    flex: 0 0 50px;
+    flex: 0 0 30px;
+    height: 24px;
   }
   
   .logo {
-    flex: 1;
+    flex: 0 0 auto;
     justify-content: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .logoWrapper {
+    width: 140px;
+    height: 45px;
+  }
+  
+  .logoText {
+    font-size: 1.1rem;
   }
   
   .burger {
     display: flex;
+    position: relative;
+    right: 0;
+    flex: 0 0 30px;
   }
   
   .navLinks {

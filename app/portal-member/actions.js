@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { uploadToS3 } from '@/lib/s3';
+
 
 async function getCurrentMember() {
   const cookieStore = await cookies();
@@ -79,15 +79,11 @@ export async function registerJourney(prevState, formData) {
   const journeyId = formData.get('journeyId');
   const phone = formData.get('phone')?.trim();
   const email = formData.get('email')?.trim();
-  const ktpNumber = formData.get('ktpNumber')?.trim();
-  const ktpFile = formData.get('ktpPhoto');
 
   // Validasi
   if (!journeyId) return { error: 'Journey ID wajib diisi.' };
   if (!phone) return { error: 'Nomor HP wajib diisi.' };
   if (!email) return { error: 'Email wajib diisi.' };
-  if (!ktpNumber) return { error: 'Nomor KTP wajib diisi.' };
-  if (!ktpFile || ktpFile.size === 0) return { error: 'Foto KTP wajib diupload.' };
 
   // Cek apakah sudah terdaftar
   const existing = await prisma.journeyRegistration.findUnique({
@@ -104,13 +100,6 @@ export async function registerJourney(prevState, formData) {
   }
 
   try {
-    // Convert File to Buffer and upload to S3
-    const bytes = await ktpFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const fileExt = ktpFile.name.split('.').pop() || 'jpg';
-    const fileName = `ktp/${member.id}_${Date.now()}.${fileExt}`;
-    const ktpPhotoUrl = await uploadToS3(buffer, fileName, ktpFile.type || 'image/jpeg');
-
     // Create registration
     await prisma.journeyRegistration.create({
       data: {
@@ -118,8 +107,6 @@ export async function registerJourney(prevState, formData) {
         userId: member.id,
         phone,
         email,
-        ktpNumber,
-        ktpPhoto: ktpPhotoUrl,
         status: 'PENDING'
       }
     });
@@ -135,16 +122,24 @@ export async function registerJourney(prevState, formData) {
 // Get expense details for a journey
 export async function getJourneyExpenses(journeyId) {
   const member = await getCurrentMember();
-  if (!member || !member.id) return { expenses: [], total: 0, approvedCount: 0, costPerMember: 0 };
+  if (!member || !member.id) return { expenses: [], total: 0, approvedCount: 0, costPerMember: 0, sharedCost: 0, individualCost: 0 };
 
   try {
-    // Get total expenses for this journey
+    // Get all expenses for this journey
     const expenses = await prisma.expense.findMany({
       where: { journeyId },
       orderBy: { date: 'desc' }
     });
 
-    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+    // Separate shared and individual expenses
+    const SHARED_CATEGORIES = ['LOGISTICS', 'EQUIPMENT_RENTAL', 'OTHER'];
+    const INDIVIDUAL_CATEGORIES = ['TRANSPORTATION', 'SIMAKSI'];
+
+    const sharedExpenses = expenses.filter(e => SHARED_CATEGORIES.includes(e.category));
+    const individualExpenses = expenses.filter(e => INDIVIDUAL_CATEGORIES.includes(e.category));
+
+    const sharedTotal = sharedExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const individualTotal = individualExpenses.reduce((sum, e) => sum + e.amount, 0);
 
     // Get count of approved registrations
     const approvedCount = await prisma.journeyRegistration.count({
@@ -154,11 +149,26 @@ export async function getJourneyExpenses(journeyId) {
       }
     });
 
-    const costPerMember = approvedCount > 0 ? Math.ceil(total / approvedCount) : total;
+    // Shared cost divided by approved members
+    const sharedCostPerMember = approvedCount > 0 ? Math.ceil(sharedTotal / approvedCount) : sharedTotal;
+    // Individual cost is per person (not divided)
+    const individualCostPerMember = individualTotal;
 
-    return { expenses, total, approvedCount, costPerMember };
+    const total = sharedTotal + individualTotal;
+    const costPerMember = sharedCostPerMember + individualCostPerMember;
+
+    return { 
+      expenses, 
+      total, 
+      approvedCount, 
+      costPerMember,
+      sharedCost: sharedCostPerMember,
+      individualCost: individualCostPerMember,
+      sharedTotal,
+      individualTotal
+    };
   } catch (error) {
     console.error('Error fetching journey expenses:', error);
-    return { expenses: [], total: 0, approvedCount: 0, costPerMember: 0 };
+    return { expenses: [], total: 0, approvedCount: 0, costPerMember: 0, sharedCost: 0, individualCost: 0 };
   }
 }

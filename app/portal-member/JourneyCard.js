@@ -60,6 +60,23 @@ export default function JourneyCard({ journey, equipmentProgress, registrationSt
       <div className={styles.journeyCard}>
         <span className={styles.journeyYear}>{journey.year}</span>
         <span className={styles.mountainName}>{journey.mountain?.name}</span>
+        {(journey.via || journey.startDate || journey.endDate) && (
+          <span className={styles.journeyDetails}>
+            {journey.via && `Via ${journey.via}`}
+            {journey.via && (journey.startDate || journey.endDate) && ' • '}
+            {journey.startDate && new Date(journey.startDate).toLocaleDateString('id-ID', { 
+              day: 'numeric', 
+              month: 'long', 
+              year: 'numeric' 
+            })}
+            {journey.startDate && journey.endDate && ' - '}
+            {journey.endDate && new Date(journey.endDate).toLocaleDateString('id-ID', { 
+              day: 'numeric', 
+              month: 'long', 
+              year: 'numeric' 
+            })}
+          </span>
+        )}
         <span className={styles.journeyStatus}>{journey.status}</span>
         
         {isApproved ? (
@@ -133,26 +150,7 @@ export default function JourneyCard({ journey, equipmentProgress, registrationSt
                   />
                 </div>
                 
-                <div className={styles.formGroup}>
-                  <label>Nomor KTP</label>
-                  <input 
-                    type="text" 
-                    name="ktpNumber" 
-                    placeholder="3275xxxxxxxxxxxx"
-                    required 
-                  />
-                </div>
-                
-                <div className={styles.formGroup}>
-                  <label>Foto KTP</label>
-                  <input 
-                    type="file" 
-                    name="ktpPhoto" 
-                    accept="image/*"
-                    required 
-                  />
-                  <small>Upload foto KTP Anda (JPG/PNG)</small>
-                </div>
+
 
                 {state?.error && (
                   <div className={styles.error}>{state.error}</div>
@@ -204,15 +202,28 @@ export default function JourneyCard({ journey, equipmentProgress, registrationSt
                   {/* Summary */}
                   <div className={styles.expenseSummary}>
                     <div className={styles.summaryItem}>
-                      <span className={styles.summaryLabel}>Total Pengeluaran</span>
-                      <span className={styles.summaryValue}>{formatCurrency(expenseData.total)}</span>
-                    </div>
-                    <div className={styles.summaryItem}>
                       <span className={styles.summaryLabel}>Peserta Diterima</span>
                       <span className={styles.summaryValue}>{expenseData.approvedCount} orang</span>
                     </div>
+                    
+                    {/* Shared Expenses (dibagi) */}
+                    {expenseData.sharedTotal > 0 && (
+                      <div className={styles.summaryItem}>
+                        <span className={styles.summaryLabel}>Biaya Bersama (dibagi)</span>
+                        <span className={styles.summaryValue}>{formatCurrency(expenseData.sharedCost)}</span>
+                      </div>
+                    )}
+                    
+                    {/* Individual Expenses (tidak dibagi) */}
+                    {expenseData.individualTotal > 0 && (
+                      <div className={styles.summaryItem}>
+                        <span className={styles.summaryLabel}>Biaya Pribadi (per orang)</span>
+                        <span className={styles.summaryValue}>{formatCurrency(expenseData.individualCost)}</span>
+                      </div>
+                    )}
+                    
                     <div className={`${styles.summaryItem} ${styles.highlight}`}>
-                      <span className={styles.summaryLabel}>Biaya per Orang</span>
+                      <span className={styles.summaryLabel}>Total Biaya per Orang</span>
                       <span className={styles.summaryValue}>{formatCurrency(expenseData.costPerMember)}</span>
                     </div>
                   </div>

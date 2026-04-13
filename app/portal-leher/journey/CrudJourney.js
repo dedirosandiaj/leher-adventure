@@ -222,6 +222,37 @@ export default function CrudJourney({ journeys: initialJourneys }) {
               />
             </div>
           </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.inputGroup}>
+              <label>Via Pendakian</label>
+              <input 
+                type="text" 
+                name="via" 
+                placeholder="Contoh: Sembalun, Senaru" 
+                required 
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.inputGroup}>
+              <label>Tanggal Mulai</label>
+              <input 
+                type="date" 
+                name="startDate" 
+                required 
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>Tanggal Selesai</label>
+              <input 
+                type="date" 
+                name="endDate" 
+                required 
+              />
+            </div>
+          </div>
           
           <div className={styles.formRow}>
             <div className={styles.inputGroup}>

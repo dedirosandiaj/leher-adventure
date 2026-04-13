@@ -37,12 +37,13 @@ export async function getExpenses(journeyId = null, category = null) {
   }
 }
 
-// Get all journeys for filter
+// Get all journeys with PLANNED status for filter
 export async function getJourneys() {
   await checkAuth();
 
   try {
     const journeys = await prisma.journey.findMany({
+      where: { status: 'PLANNED' },
       include: { mountain: true },
       orderBy: { year: 'desc' }
     });
@@ -68,6 +69,7 @@ export async function createExpense(prevState, formData) {
   if (!title) return { error: 'Judul wajib diisi.' };
   if (!amount || amount <= 0) return { error: 'Jumlah wajib diisi dan harus lebih dari 0.' };
   if (!category) return { error: 'Kategori wajib dipilih.' };
+  if (!journeyId) return { error: 'Pendakian wajib dipilih.' };
 
   try {
     await prisma.expense.create({
@@ -82,10 +84,10 @@ export async function createExpense(prevState, formData) {
     });
 
     revalidatePath('/portal-leher/keuangan');
-    return { success: 'Pengeluaran berhasil ditambahkan.' };
+    return { success: 'Rencana berhasil ditambahkan.' };
   } catch (error) {
     console.error('Error creating expense:', error);
-    return { error: 'Gagal menambahkan pengeluaran.' };
+    return { error: 'Gagal menambahkan rencana.' };
   }
 }
 
@@ -105,6 +107,7 @@ export async function updateExpense(prevState, formData) {
   if (!title) return { error: 'Judul wajib diisi.' };
   if (!amount || amount <= 0) return { error: 'Jumlah wajib diisi dan harus lebih dari 0.' };
   if (!category) return { error: 'Kategori wajib dipilih.' };
+  if (!journeyId) return { error: 'Pendakian wajib dipilih.' };
 
   try {
     await prisma.expense.update({
@@ -120,10 +123,10 @@ export async function updateExpense(prevState, formData) {
     });
 
     revalidatePath('/portal-leher/keuangan');
-    return { success: 'Pengeluaran berhasil diupdate.' };
+    return { success: 'Rencana berhasil diupdate.' };
   } catch (error) {
     console.error('Error updating expense:', error);
-    return { error: 'Gagal mengupdate pengeluaran.' };
+    return { error: 'Gagal mengupdate rencana.' };
   }
 }
 
@@ -141,10 +144,10 @@ export async function deleteExpense(prevState, formData) {
     });
 
     revalidatePath('/portal-leher/keuangan');
-    return { success: 'Pengeluaran berhasil dihapus.' };
+    return { success: 'Rencana berhasil dihapus.' };
   } catch (error) {
     console.error('Error deleting expense:', error);
-    return { error: 'Gagal menghapus pengeluaran.' };
+    return { error: 'Gagal menghapus rencana.' };
   }
 }
 

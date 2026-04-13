@@ -15,3 +15,4 @@ export default async function JourneyAdminPage() {
   });
   return <CrudJourney journeys={journeys} />;
 }
+

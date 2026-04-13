@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #b90040 0%, #e70052 100%);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, .font-headline {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-container": "#d7e4ec",
+              "on-secondary-container": "#5a666d",
+              "surface": "#f8f9fb",
+              "background": "#f8f9fb",
+              "surface-variant": "#e0e3e5",
+              "error-container": "#ffdad6",
+              "outline": "#936e6d",
+              "primary-fixed-dim": "#ffb2ba",
+              "on-secondary-fixed-variant": "#3c494f",
+              "surface-dim": "#d8dadc",
+              "on-tertiary": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-secondary": "#ffffff",
+              "inverse-on-surface": "#eff1f3",
+              "on-background": "#191c1e",
+              "surface-container-low": "#f2f4f6",
+              "primary-fixed": "#ffd9dc",
+              "tertiary-fixed-dim": "#ffb4ac",
+              "secondary": "#546067",
+              "surface-container-highest": "#e0e3e5",
+              "surface-container-high": "#e6e8ea",
+              "inverse-surface": "#2d3133",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-container": "#bb554d",
+              "outline-variant": "#e8bcbb",
+              "on-secondary-fixed": "#111d23",
+              "surface-container": "#eceef0",
+              "primary": "#b90040",
+              "on-tertiary-container": "#fffbff",
+              "on-surface-variant": "#5e3f3e",
+              "secondary-fixed-dim": "#bbc8d0",
+              "on-primary-fixed": "#400010",
+              "tertiary": "#9b3d37",
+              "error": "#ba1a1a",
+              "secondary-fixed": "#d7e4ec",
+              "primary-container": "#e70052",
+              "on-tertiary-fixed-variant": "#7f2924",
+              "on-primary-container": "#fffbff",
+              "surface-bright": "#f8f9fb",
+              "on-error": "#ffffff",
+              "on-surface": "#191c1e",
+              "on-primary-fixed-variant": "#910030",
+              "on-primary": "#ffffff",
+              "tertiary-fixed": "#ffdad6",
+              "surface-tint": "#bd0041",
+              "inverse-primary": "#ffb2ba",
+              "on-tertiary-fixed": "#410003"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-background min-h-screen">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 shadow-sm dark:shadow-none flex justify-between items-center w-full px-8 py-4 font-['Manrope'] text-sm tracking-wide">
+<div class="flex items-center gap-4">
+<img class="w-8 h-8 object-contain" data-alt="Nusacita brand icon logo, a modern and clean geometric symbol with soft rounded edges in vibrant pinkish-red tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd0LgfQAj9zmNYeVvEIYRFo8aNCHg7lT04q-5R8CJraZLSK3noyxQRIjMomgA4N1CYa0ieK-RfNGjDeMvBZk5_m6ps7nVZaTplGrTMMKwsrmV_ywzEh6pF2-q7bCDQLnfGxC4VImtWUiyNcfB1tYs9rpZOwRMMT-ku_ajqS8MRclXUS34Tc_g2AwxNshOdjkkHhA5wofjGjsZBlcaGv6hQ6wFjcol-w6gUPp11_lisg9QtX4yO6e1JFETR52xZ3vEErrv_MMqjapZg"/>
+<span class="text-[#b90040] dark:text-[#e70052] font-extrabold text-xl tracking-tight">Nusacita</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-[#546067] dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors px-3 py-2 cursor-pointer">Help</span>
+<div class="material-symbols-outlined text-[#546067] dark:text-slate-400 scale-95 active:opacity-80 transition-transform cursor-pointer" data-icon="account_circle">account_circle</div>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="hidden md:flex flex-col pt-20 h-screen w-72 fixed left-0 top-0 bg-[#f8f9fb] dark:bg-slate-950 z-40">
+<div class="px-8 py-10">
+<h2 class="font-['Manrope'] text-[#191c1e] text-2xl font-bold">Onboarding</h2>
+<p class="text-on-surface-variant text-xs uppercase tracking-widest mt-1">Merchant Registration</p>
+</div>
+<nav class="flex-1">
+<!-- Active Step -->
+<div class="flex items-center gap-3 text-[#b90040] dark:text-[#e70052] font-bold border-r-4 border-[#FF1744] bg-white dark:bg-slate-900 px-8 py-5 cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span>Data Diri &amp; Usaha</span>
+</div>
+<!-- Inactive Steps -->
+<div class="flex items-center gap-3 text-[#546067] dark:text-slate-400 px-8 py-5 hover:text-[#b90040] dark:hover:text-[#e70052] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span>Alamat &amp; Kontak</span>
+</div>
+<div class="flex items-center gap-3 text-[#546067] dark:text-slate-400 px-8 py-5 hover:text-[#b90040] dark:hover:text-[#e70052] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<span>Data Bank &amp; Operasional</span>
+</div>
+<div class="flex items-center gap-3 text-[#546067] dark:text-slate-400 px-8 py-5 hover:text-[#b90040] dark:hover:text-[#e70052] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Dokumen Legal</span>
+</div>
+<div class="flex items-center gap-3 text-[#546067] dark:text-slate-400 px-8 py-5 hover:text-[#b90040] dark:hover:text-[#e70052] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span>Syarat &amp; Ketentuan</span>
+</div>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-72 pt-28 pb-32 px-6 md:px-12 lg:px-20 max-w-6xl mx-auto">
+<!-- Progress Bar (Editorial Style) -->
+<div class="mb-12">
+<div class="flex justify-between items-end mb-4">
+<span class="text-on-surface-variant text-sm font-semibold tracking-wider uppercase">Langkah 1 dari 5</span>
+<span class="text-primary font-bold text-lg">20% Selesai</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full signature-gradient w-1/5 rounded-full"></div>
+</div>
+</div>
+<!-- Hero Section -->
+<section class="mb-12">
+<h1 class="text-4xl md:text-5xl font-extrabold text-on-surface mb-4 leading-tight">Halo, Calon Partner Nusacita! 👋</h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-2xl leading-relaxed">
+                Mohon isi data dasar bisnis Anda untuk keperluan verifikasi sesuai regulasi BI &amp; OJK.
+            </p>
+</section>
+<!-- Form Section with Bento Grid approach -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Main Form Card -->
+<div class="lg:col-span-8 space-y-8">
+<div class="bg-surface-container-lowest rounded-xl p-8 md:p-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.04)] border border-outline-variant/15">
+<div class="space-y-10">
+<!-- Group 1: Identitas Bisnis -->
+<div class="space-y-6">
+<h3 class="text-xl font-bold text-on-surface border-l-4 border-primary pl-4">Identitas Bisnis</h3>
+<div class="grid grid-cols-1 gap-6">
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant ml-1">Nama Bisnis</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/15 rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary-fixed focus:border-primary/40 transition-all text-on-surface" placeholder="Masukkan nama resmi usaha Anda" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant ml-1">Jenis Usaha</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/15 rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary-fixed focus:border-primary/40 transition-all text-on-surface appearance-none">
+<option disabled="" selected="">Pilih Jenis Usaha</option>
+<option>Perorangan</option>
+<option>Badan Usaha (PT/CV)</option>
+<option>Yayasan/Organisasi</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant ml-1">Bidang Usaha (MCC)</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/15 rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary-fixed focus:border-primary/40 transition-all text-on-surface appearance-none">
+<option disabled="" selected="">Pilih MCC</option>
+<option>F&amp;B - Restoran &amp; Kafe</option>
+<option>Ritel - Fashion &amp; Lifestyle</option>
+<option>Jasa - Kesehatan &amp; Kecantikan</option>
+<option>E-commerce &amp; Digital</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Group 2: Operasional & Pajak -->
+<div class="space-y-6">
+<h3 class="text-xl font-bold text-on-surface border-l-4 border-primary pl-4">Operasional &amp; Pajak</h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant ml-1">Estimasi Transaksi Bulanan</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/15 rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary-fixed focus:border-primary/40 transition-all text-on-surface appearance-none">
+<option disabled="" selected="">Pilih Range Transaksi</option>
+<option>&lt; Rp 10 Juta</option>
+<option>Rp 10 Juta - Rp 100 Juta</option>
+<option>Rp 100 Juta - Rp 500 Juta</option>
+<option>&gt; Rp 500 Juta</option>
+</select>
+</div>
+<div class="space-y-4">
+<label class="block text-sm font-semibold text-on-surface-variant ml-1">Apakah Anda sudah memiliki NPWP?</label>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<label class="relative flex items-center p-4 border border-outline-variant/15 rounded-xl cursor-pointer hover:bg-surface-container-low transition-all group">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary-fixed" name="npwp" type="radio" value="ada"/>
+<span class="ml-3 font-medium text-on-surface">Sudah Ada</span>
+<span class="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</span>
+</label>
+<label class="relative flex items-center p-4 border border-outline-variant/15 rounded-xl cursor-pointer hover:bg-surface-container-low transition-all group">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary-fixed" name="npwp" type="radio" value="belum"/>
+<span class="ml-3 font-medium text-on-surface">Belum Ada</span>
+<span class="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary" data-icon="pending" style="font-variation-settings: 'FILL' 1;">pending</span>
+</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Informational Sidebar (Contextual) -->
+<div class="lg:col-span-4 space-y-6">
+<div class="bg-primary/5 rounded-xl p-6 border border-primary/10">
+<div class="flex items-center gap-3 text-primary mb-4">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+<span class="font-bold">Kenapa data ini penting?</span>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                        Data diri dan profil usaha membantu kami menentukan model bisnis Anda agar proses verifikasi di BI dan OJK berjalan lebih cepat dan tepat sasaran.
+                    </p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/10">
+<h4 class="font-bold text-on-surface mb-4">Bantuan Cepat</h4>
+<ul class="space-y-4 text-sm">
+<li class="flex items-start gap-3 text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-lg" data-icon="help_outline">help_outline</span>
+<span>Apa itu Kode MCC?</span>
+</li>
+<li class="flex items-start gap-3 text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-lg" data-icon="description">description</span>
+<span>Dokumen yang perlu disiapkan</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Shell (Sticky Action) -->
+<footer class="fixed bottom-0 right-0 w-full md:w-[calc(100%-18rem)] z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-[#e0e3e5]/30 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+<div class="flex justify-between items-center px-8 md:px-12 py-6">
+<div class="hidden sm:flex items-center gap-8 font-['Manrope'] font-medium text-sm">
+<span class="text-[#546067] dark:text-slate-400 hover:text-[#b90040] transition-colors cursor-pointer">Kembali</span>
+<span class="text-[#546067] dark:text-slate-400 hover:text-[#b90040] transition-colors cursor-pointer">Bantuan</span>
+</div>
+<div class="flex items-center gap-4 w-full sm:w-auto">
+<button class="w-full sm:w-auto bg-gradient-to-r from-[#b90040] to-[#e70052] text-white rounded-md px-10 py-3 font-['Manrope'] font-bold text-base shadow-lg shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all">
+                    Simpan &amp; Lanjut
+                </button>
+</div>
+</div>
+</footer>
+</body></html>

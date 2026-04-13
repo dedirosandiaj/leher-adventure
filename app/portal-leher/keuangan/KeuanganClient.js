@@ -103,12 +103,12 @@ export default function KeuanganClient({ expenses, journeys, stats }) {
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
-        <h1 className={styles.title}>Keuangan & Pengeluaran</h1>
+        <h1 className={styles.title}>Perencanaan Keuangan</h1>
         <button 
           className={styles.addBtn}
           onClick={() => { setShowForm(true); setEditingExpense(null); }}
         >
-          + Tambah Pengeluaran
+          + Tambah Rencana
         </button>
       </div>
 
@@ -120,7 +120,7 @@ export default function KeuanganClient({ expenses, journeys, stats }) {
         </div>
         <div className={`${styles.statCard} ${styles.statMoney}`}>
           <span className={styles.statNumber}>{formatCurrency(stats.total)}</span>
-          <span className={styles.statLabel}>Total Pengeluaran</span>
+          <span className={styles.statLabel}>Total Anggaran</span>
         </div>
         <div className={`${styles.statCard} ${styles.statMoney}`}>
           <span className={styles.statNumber}>{formatCurrency(filteredTotal)}</span>
@@ -233,7 +233,7 @@ export default function KeuanganClient({ expenses, journeys, stats }) {
 
         {filteredExpenses.length === 0 && (
           <div className={styles.emptyState}>
-            Tidak ada pengeluaran yang ditemukan.
+            Tidak ada rencana yang ditemukan.
           </div>
         )}
       </div>
@@ -243,7 +243,7 @@ export default function KeuanganClient({ expenses, journeys, stats }) {
         <div className={styles.modalOverlay} onClick={() => setShowForm(false)}>
           <div className={styles.formModal} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3>{editingExpense ? 'Edit Pengeluaran' : 'Tambah Pengeluaran'}</h3>
+              <h3>{editingExpense ? 'Edit Rencana' : 'Tambah Rencana'}</h3>
               <button className={styles.closeBtn} onClick={() => { setShowForm(false); setEditingExpense(null); }}>×</button>
             </div>
             <form action={handleFormSubmit} className={styles.expenseForm}>
@@ -262,7 +262,7 @@ export default function KeuanganClient({ expenses, journeys, stats }) {
                 <input 
                   type="text" 
                   name="title"
-                  placeholder="Judul pengeluaran"
+                  placeholder="Judul rencana"
                   defaultValue={editingExpense?.title || ''}
                   required 
                 />
@@ -291,8 +291,8 @@ export default function KeuanganClient({ expenses, journeys, stats }) {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Pendakian (Opsional)</label>
-                <select name="journeyId" defaultValue={editingExpense?.journeyId || ''}>
+                <label>Pendakian <span className={styles.required}>*</span></label>
+                <select name="journeyId" defaultValue={editingExpense?.journeyId || ''} required>
                   <option value="">Pilih Pendakian</option>
                   {journeys.map(journey => (
                     <option key={journey.id} value={journey.id}>
@@ -338,7 +338,7 @@ export default function KeuanganClient({ expenses, journeys, stats }) {
         <div className={styles.modalOverlay} onClick={() => setShowDeleteModal(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <h3>Konfirmasi Hapus</h3>
-            <p>Apakah Anda yakin ingin menghapus pengeluaran ini?</p>
+            <p>Apakah Anda yakin ingin menghapus rencana ini?</p>
             <div className={styles.modalActions}>
               <button 
                 className={styles.cancelBtn}

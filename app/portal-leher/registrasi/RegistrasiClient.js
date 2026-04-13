@@ -4,14 +4,14 @@ import { useState, useTransition } from 'react';
 import { useActionState } from 'react';
 import { updateRegistrationStatus, deleteRegistration } from './actions';
 import styles from '../crud.module.css';
+import * as XLSX from 'xlsx';
 
 export default function RegistrasiClient({ registrations, journeys, stats }) {
   const [selectedJourney, setSelectedJourney] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [showPhotoModal, setShowPhotoModal] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState(null);
+
   const [isUpdatePending, startUpdateTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
 
@@ -39,41 +39,7 @@ export default function RegistrasiClient({ registrations, journeys, stats }) {
     setShowDeleteModal(true);
   };
 
-  const handleViewPhoto = async (url) => {
-    console.log('Opening photo URL:', url);
-    // Pastikan URL valid
-    if (!url || url === 'null' || url === 'undefined') {
-      alert('URL foto tidak valid');
-      return;
-    }
-    
-    // Extract key from URL
-    const key = url.replace('https://s3.ucentric.id/leheradventure/', '');
-    console.log('Extracted key:', key);
-    
-    try {
-      // Get presigned URL from API
-      const response = await fetch(`/api/ktp-image?key=${encodeURIComponent(key)}`);
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Presigned URL generated:', data.url);
-        setPhotoUrl(data.url);
-      } else {
-        // Fallback to original URL
-        console.log('Using original URL');
-        setPhotoUrl(url);
-      }
-    } catch (err) {
-      console.error('Error getting presigned URL:', err);
-      setPhotoUrl(url);
-    }
-    setShowPhotoModal(true);
-  };
 
-  const closePhotoModal = () => {
-    setShowPhotoModal(false);
-    setPhotoUrl(null);
-  };
 
   const confirmDelete = () => {
     if (deleteId) {
@@ -101,9 +67,119 @@ export default function RegistrasiClient({ registrations, journeys, stats }) {
     return <span className={`${styles.statusBadge} ${statusClasses[status]}`}>{statusLabels[status]}</span>;
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
+  // Download Report to Excel
+  const handleDownloadReport = () => {
+    if (filteredRegistrations.length === 0) {
+      alert('Tidak ada data untuk di-download');
+      return;
+    }
+
+    // Sheet 1: Member Data
+    const memberData = filteredRegistrations.map((reg, index) => ({
+      'No': index + 1,
+      'Nama Member': reg.user?.name || reg.user?.username,
+      'Username': reg.user?.username,
+      'Pendakian': reg.journey?.mountain?.name,
+      'Tahun': reg.journey?.year,
+      'Nomor HP': reg.phone,
+      'Email': reg.email,
+      'Biaya per Orang': reg.status === 'APPROVED' && reg.costPerMember > 0 ? reg.costPerMember : 0,
+      'Status': reg.status === 'APPROVED' ? 'Diterima' : reg.status === 'REJECTED' ? 'Ditolak' : 'Menunggu',
+      'Tanggal Daftar': new Date(reg.createdAt).toLocaleDateString('id-ID'),
+    }));
+
+    // Sheet 2: Rincian Biaya (list semua pengeluaran)
+    const expenseData = [];
+    const journeyExpenses = {};
+    
+    // Group expenses by journey
+    filteredRegistrations.forEach(reg => {
+      if (!journeyExpenses[reg.journeyId]) {
+        journeyExpenses[reg.journeyId] = {
+          journey: reg.journey,
+          expenses: reg.journey?.expenses || [],
+          approvedCount: 0,
+          members: []
+        };
+      }
+      if (reg.status === 'APPROVED') {
+        journeyExpenses[reg.journeyId].approvedCount += 1;
+        journeyExpenses[reg.journeyId].members.push(reg.user?.name || reg.user?.username);
+      }
+    });
+
+    // Add expense list for each journey
+    Object.values(journeyExpenses).forEach(item => {
+      // Header row for journey
+      expenseData.push({
+        'Kategori': `${item.journey?.mountain?.name} (${item.journey?.year})`,
+        'Judul': '',
+        'Jumlah': ''
+      });
+      
+      // List all expenses - Kategori, Judul dan Jumlah
+      if (item.expenses && item.expenses.length > 0) {
+        item.expenses.forEach(exp => {
+          expenseData.push({
+            'Kategori': exp.category,
+            'Judul': exp.title,
+            'Jumlah': exp.amount
+          });
+        });
+        
+        // Add total row
+        const total = item.expenses.reduce((sum, e) => sum + e.amount, 0);
+        expenseData.push({
+          'Kategori': 'TOTAL',
+          'Judul': '',
+          'Jumlah': total
+        });
+      }
+      
+      // Empty row as separator
+      expenseData.push({
+        'Kategori': '',
+        'Judul': '',
+        'Jumlah': ''
+      });
+    });
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    
+    // Add Sheet 1: Member
+    const ws1 = XLSX.utils.json_to_sheet(memberData);
+    XLSX.utils.book_append_sheet(wb, ws1, 'Member');
+    
+    // Add Sheet 2: Rincian Biaya
+    const ws2 = XLSX.utils.json_to_sheet(expenseData);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Rincian Biaya');
+
+    // Download
+    const fileName = `Report_Registrasi_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Kelola Registrasi Pendakian</h1>
+      <div className={styles.headerRow}>
+        <h1 className={styles.title}>Kelola Registrasi Pendakian</h1>
+        <button 
+          className={styles.downloadBtn}
+          onClick={handleDownloadReport}
+          disabled={filteredRegistrations.length === 0}
+        >
+          📥 Download Report
+        </button>
+      </div>
 
       {/* Stats Cards */}
       <div className={styles.statsGrid}>
@@ -167,7 +243,7 @@ export default function RegistrasiClient({ registrations, journeys, stats }) {
               <th>Member</th>
               <th>Pendakian</th>
               <th>Kontak</th>
-              <th>KTP</th>
+              <th>Biaya per Orang</th>
               <th>Status</th>
               <th>Tanggal Daftar</th>
               <th>Aksi</th>
@@ -194,15 +270,11 @@ export default function RegistrasiClient({ registrations, journeys, stats }) {
                   </div>
                 </td>
                 <td>
-                  <div className={styles.ktpInfo}>
-                    <span>{reg.ktpNumber}</span>
-                    <button
-                      onClick={() => handleViewPhoto(reg.ktpPhoto)}
-                      className={styles.ktpLinkBtn}
-                    >
-                      Lihat Foto
-                    </button>
-                  </div>
+                  {reg.status === 'APPROVED' && reg.costPerMember > 0 ? (
+                    <span className={styles.costValue}>{formatCurrency(reg.costPerMember)}</span>
+                  ) : (
+                    <span className={styles.costEmpty}>-</span>
+                  )}
                 </td>
                 <td>{getStatusBadge(reg.status)}</td>
                 <td>{new Date(reg.createdAt).toLocaleDateString('id-ID')}</td>
@@ -294,32 +366,7 @@ export default function RegistrasiClient({ registrations, journeys, stats }) {
         </div>
       )}
 
-      {/* Photo Viewer Modal */}
-      {showPhotoModal && (
-        <div className={styles.photoModalOverlay} onClick={closePhotoModal}>
-          <div className={styles.photoModal} onClick={e => e.stopPropagation()}>
-            <button className={styles.closePhotoBtn} onClick={closePhotoModal}>
-              ×
-            </button>
-            {photoUrl ? (
-              <img 
-                src={photoUrl} 
-                alt="Foto KTP" 
-                className={styles.photoImage}
-                onError={(e) => {
-                  console.error('Failed to load image:', photoUrl);
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'block';
-                }}
-              />
-            ) : null}
-            <div style={{display: 'none', color: 'white', textAlign: 'center'}}>
-              <p>Gagal memuat foto</p>
-              <p style={{fontSize: '0.8rem', color: '#aaa'}}>{photoUrl}</p>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

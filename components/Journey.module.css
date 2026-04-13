@@ -21,9 +21,10 @@
   color: var(--primary);
   opacity: 0.8;
   font-size: 1.1rem;
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
+  padding: 0 1.5rem;
 }
 
 /* Timeline Container */
@@ -31,6 +32,7 @@
   max-width: 800px;
   margin: 0 auto;
   position: relative;
+  padding: 0 1rem;
 }
 
 /* Timeline Item */
@@ -238,11 +240,13 @@
   }
   
   .title {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
   
   .subtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    padding: 0 1rem;
+    line-height: 1.5;
   }
   
   .timelineItem {
@@ -292,7 +296,12 @@
 /* Small Mobile */
 @media (max-width: 480px) {
   .title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+  
+  .subtitle {
+    font-size: 0.9rem;
+    padding: 0 0.75rem;
   }
   
   .year {
@@ -302,5 +311,9 @@
   .status {
     font-size: 0.7rem;
     padding: 0.3rem 0.6rem;
+  }
+  
+  .timeline {
+    padding: 0 0.5rem;
   }
 }

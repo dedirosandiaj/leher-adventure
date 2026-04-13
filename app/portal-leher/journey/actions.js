@@ -19,13 +19,36 @@ export async function addMountain(prevState, formData) {
   const name = formData.get('name')?.trim();
   const year = parseInt(formData.get('year'));
   const status = formData.get('status') || 'Rencana';
+  const via = formData.get('via')?.trim();
+  const startDate = formData.get('startDate');
+  const endDate = formData.get('endDate');
   const id = formData.get('id');
 
   if (!name || !year) {
     return { error: 'Nama gunung dan tahun wajib diisi.' };
   }
 
+  if (!via) {
+    return { error: 'Via pendakian wajib diisi.' };
+  }
+
+  if (!startDate) {
+    return { error: 'Tanggal mulai wajib diisi.' };
+  }
+
+  if (!endDate) {
+    return { error: 'Tanggal selesai wajib diisi.' };
+  }
+
   try {
+    const journeyData = {
+      year,
+      status: mapStatus(status),
+      via,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+    };
+
     if (id) {
       // Update - update both Mountain name and Journey year/status
       await prisma.mountain.update({
@@ -41,7 +64,7 @@ export async function addMountain(prevState, formData) {
       if (journey) {
         await prisma.journey.update({
           where: { id: journey.id },
-          data: { year, status: mapStatus(status) },
+          data: journeyData,
         });
       }
     } else {
@@ -53,8 +76,7 @@ export async function addMountain(prevState, formData) {
       await prisma.journey.create({
         data: {
           mountainId: mountain.id,
-          year,
-          status: mapStatus(status),
+          ...journeyData,
         },
       });
     }

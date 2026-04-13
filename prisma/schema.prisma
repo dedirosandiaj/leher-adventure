@@ -84,7 +84,7 @@ model Journey {
   status      JourneyStatus @default(PLANNED)
   startDate   DateTime?
   endDate     DateTime?
-  description String?
+  via         String?
   createdAt   DateTime      @default(now()) @db.Timestamp(6)
   updatedAt   DateTime      @updatedAt @db.Timestamp(6)
 
@@ -99,8 +99,6 @@ model JourneyRegistration {
   userId    String   @db.Uuid
   phone     String
   email     String
-  ktpNumber String
-  ktpPhoto  String
   status    RegistrationStatus @default(PENDING)
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
