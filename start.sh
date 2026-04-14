@@ -9,7 +9,7 @@ npm run build
 
 echo "Syncing database schema with Prisma..."
 export DATABASE_URL="${DATABASE_URL}"
-npx prisma db push --skip-generate
+npx prisma db push
 
 echo "Starting Next.js application..."
 # Set NODE_OPTIONS untuk increase memory dan payload limit
