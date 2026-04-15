@@ -1,5 +1,5 @@
 .journey {
-  background: linear-gradient(180deg, var(--accent) 0%, #e8ebe6 100%);
+  background: linear-gradient(180deg, var(--bg-light) 0%, var(--accent) 100%);
   padding: 6rem 0;
   position: relative;
 }
@@ -19,7 +19,7 @@
 
 .subtitle {
   color: var(--primary);
-  opacity: 0.8;
+  opacity: 0.7;
   font-size: 1.1rem;
   max-width: 600px;
   margin: 0 auto;
@@ -27,77 +27,33 @@
   padding: 0 1.5rem;
 }
 
-/* Timeline Container */
-.timeline {
-  max-width: 800px;
+/* Accordion Container */
+.accordion {
+  max-width: 700px;
   margin: 0 auto;
-  position: relative;
   padding: 0 1rem;
 }
 
-/* Timeline Item */
-.timelineItem {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-}
-
-.timelineItem:last-child {
-  margin-bottom: 0;
-}
-
-/* Timeline Marker (Left Side) */
-.timelineMarker {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-  width: 40px;
-}
-
-.markerIcon {
-  width: 40px;
-  height: 40px;
-  background: var(--secondary);
-  color: var(--primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid var(--bg-light);
-  box-shadow: 0 4px 12px rgba(242, 187, 80, 0.3);
-  z-index: 2;
-}
-
-.timelineLine {
-  width: 3px;
-  flex: 1;
-  background: linear-gradient(180deg, var(--secondary) 0%, transparent 100%);
-  margin-top: 0.5rem;
-  min-height: 40px;
-}
-
-.timelineItem:last-child .timelineLine {
-  display: none;
-}
-
-/* Card */
-.card {
-  flex: 1;
-  background: var(--bg-light);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(43, 77, 89, 0.08);
+/* Accordion Item */
+.accordionItem {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 12px rgba(43, 77, 89, 0.06);
   overflow: hidden;
   transition: box-shadow 0.3s ease;
 }
 
-.card:hover {
-  box-shadow: 0 8px 30px rgba(43, 77, 89, 0.12);
+.accordionItem:hover {
+  box-shadow: 0 4px 20px rgba(43, 77, 89, 0.1);
 }
 
-/* Card Header */
-.cardHeader {
+.accordionItem.open {
+  box-shadow: 0 4px 24px rgba(43, 77, 89, 0.12);
+}
+
+/* Accordion Header */
+.accordionHeader {
   width: 100%;
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -109,11 +65,11 @@
   transition: background 0.2s ease;
 }
 
-.cardHeader:hover {
+.accordionHeader:hover {
   background: rgba(43, 77, 89, 0.02);
 }
 
-.yearBadge {
+.yearSection {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -121,38 +77,21 @@
 
 .year {
   font-family: 'Crimson Pro', serif;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary);
 }
 
-.status {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 700;
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
-}
-
-.selesai {
-  background-color: #4caf50;
-  color: white;
-}
-
-.berlangsung {
-  background-color: #ff9800;
-  color: white;
-}
-
-.rencana {
-  background-color: #2196f3;
-  color: white;
+.mountainCount {
+  font-size: 0.85rem;
+  color: var(--primary);
+  opacity: 0.6;
+  font-weight: 500;
 }
 
 .chevron {
   color: var(--primary);
-  opacity: 0.6;
+  opacity: 0.5;
   transition: transform 0.3s ease, opacity 0.2s ease;
 }
 
@@ -161,71 +100,116 @@
   opacity: 1;
 }
 
-/* Card Content */
-.cardContent {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, padding 0.4s ease;
-}
-
-.cardContent.expanded {
-  max-height: 500px;
+/* Accordion Content */
+.accordionContent {
   padding: 0 1.5rem 1.5rem;
+  animation: slideDown 0.3s ease;
 }
 
-/* Mountains Grid */
-.mountainsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(43, 77, 89, 0.08);
-}
-
-@media (max-width: 500px) {
-  .mountainsGrid {
-    grid-template-columns: 1fr;
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.mountainItem {
+/* Mountain Row */
+.mountainRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(43, 77, 89, 0.06);
+}
+
+.mountainRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.mountainRow:first-child {
+  padding-top: 0.5rem;
+}
+
+.mountainIcon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--secondary) 0%, #e6a83a 100%);
+  color: var(--primary);
+  border-radius: 10px;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  background: white;
-  border-radius: 10px;
-  border: 1px solid rgba(43, 77, 89, 0.06);
-  transition: all 0.2s ease;
-  flex-wrap: nowrap;
-}
-
-.mountainItem:hover {
-  border-color: var(--secondary);
-  transform: translateX(4px);
-}
-
-.mountainItem svg {
-  color: var(--secondary);
+  justify-content: center;
   flex-shrink: 0;
+}
+
+.mountainInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .mountainName {
   color: var(--primary);
-  font-weight: 500;
-  font-size: 0.95rem;
-  flex: 1;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
-.mountainStatus {
+.mountainMeta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--primary);
+  opacity: 0.7;
+}
+
+.metaItem svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Status Badge */
+.statusBadge {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
-  padding: 0.35rem 0.6rem;
-  border-radius: 12px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
   white-space: nowrap;
-  min-width: fit-content;
+}
+
+.completed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.ongoing {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.planned {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.cancelled {
+  background-color: #ffebee;
+  color: #c62828;
 }
 
 /* Mobile Responsive */
@@ -249,47 +233,46 @@
     line-height: 1.5;
   }
   
-  .timelineItem {
-    gap: 1rem;
+  .accordion {
+    padding: 0 0.75rem;
   }
   
-  .timelineMarker {
-    width: 32px;
-  }
-  
-  .markerIcon {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .markerIcon svg {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .cardHeader {
+  .accordionHeader {
     padding: 1rem 1.25rem;
   }
   
   .year {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
   
-  .yearBadge {
-    gap: 0.75rem;
+  .mountainCount {
+    font-size: 0.8rem;
   }
   
-  .cardContent.expanded {
+  .accordionContent {
     padding: 0 1.25rem 1.25rem;
   }
   
-  .mountainsGrid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+  .mountainRow {
+    gap: 0.75rem;
   }
   
-  .mountainItem {
-    padding: 0.75rem;
+  .mountainIcon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .mountainIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .mountainName {
+    font-size: 0.95rem;
+  }
+  
+  .mountainMeta {
+    gap: 0.75rem;
   }
 }
 
@@ -304,16 +287,21 @@
     padding: 0 0.75rem;
   }
   
-  .year {
-    font-size: 1.25rem;
-  }
-  
-  .status {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
-  }
-  
-  .timeline {
+  .accordion {
     padding: 0 0.5rem;
+  }
+  
+  .year {
+    font-size: 1.1rem;
+  }
+  
+  .mountainCount {
+    font-size: 0.75rem;
+  }
+  
+  .mountainMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }

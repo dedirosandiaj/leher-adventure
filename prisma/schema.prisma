@@ -7,31 +7,25 @@ datasource db {
 }
 
 model About {
-  id        String   @id @default(uuid()) @db.Uuid
   content   String   @default("Leher Adventure adalah komunitas petualangan...")
   updatedAt DateTime @updatedAt @db.Timestamp(6)
+  id        String   @id @default(uuid()) @db.Uuid
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  username  String   @unique
-  password  String
-  email     String   @unique
-  name      String
-  role      UserRole @default(MEMBER)
-  phone     String?
-  photo     String?
-  isTeam    Boolean  @default(false)  // Tampilkan di section Team
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
-  equipments UserEquipment[]
+  id            String                @id @default(uuid()) @db.Uuid
+  username      String                @unique
+  password      String
+  email         String                @unique
+  name          String
+  role          UserRole              @default(MEMBER)
+  phone         String?
+  photo         String?
+  isTeam        Boolean               @default(false)
+  createdAt     DateTime              @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime              @updatedAt @db.Timestamp(6)
   registrations JourneyRegistration[]
-}
-
-enum UserRole {
-  ADMIN
-  MEMBER
+  equipments    UserEquipment[]
 }
 
 model Media {
@@ -46,6 +40,113 @@ model Media {
   updatedAt DateTime     @updatedAt @db.Timestamp(6)
 }
 
+model HeroText {
+  titleLine1  String   @default("Selamat Datang di")
+  titleLine2  String   @default("Leher Adventure")
+  description String   @default("Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.")
+  updatedAt   DateTime @updatedAt @db.Timestamp(6)
+  id          String   @id @default(uuid()) @db.Uuid
+}
+
+model Mountain {
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String
+  height     Int?
+  location   String?
+  difficulty String?
+  image      String?
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @db.Timestamp(6)
+  latitude   Float?
+  longitude  Float?
+  journeys   Journey[]
+}
+
+model Journey {
+  id            String                @id @default(uuid()) @db.Uuid
+  mountainId    String                @db.Uuid
+  year          Int                   @default(2024)
+  status        JourneyStatus         @default(PLANNED)
+  startDate     DateTime?
+  endDate       DateTime?
+  via           String?
+  createdAt     DateTime              @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime              @updatedAt @db.Timestamp(6)
+  mountain      Mountain              @relation(fields: [mountainId], references: [id], onDelete: Cascade)
+  expenses      Expense[]
+  registrations JourneyRegistration[]
+}
+
+model JourneyRegistration {
+  id        String             @id @default(uuid()) @db.Uuid
+  journeyId String             @db.Uuid
+  userId    String             @db.Uuid
+  phone     String
+  email     String
+  status    RegistrationStatus @default(PENDING)
+  createdAt DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt DateTime           @updatedAt @db.Timestamp(6)
+  journey   Journey            @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([journeyId, userId])
+  @@map("journey_registration")
+}
+
+model Expense {
+  id          String          @id @default(uuid()) @db.Uuid
+  journeyId   String?         @db.Uuid
+  category    ExpenseCategory
+  title       String
+  amount      Int
+  description String?
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime        @updatedAt @db.Timestamp(6)
+  journey     Journey?        @relation(fields: [journeyId], references: [id])
+
+  @@map("expense")
+}
+
+model EquipmentCategory {
+  id        String          @id @default(uuid()) @db.Uuid
+  name      String          @unique
+  order     Int             @default(0)
+  createdAt DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt DateTime        @updatedAt @db.Timestamp(6)
+  items     EquipmentItem[]
+}
+
+model EquipmentItem {
+  name        String
+  description String?
+  required    Boolean           @default(false)
+  createdAt   DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime          @updatedAt @db.Timestamp(6)
+  categoryId  String            @db.Uuid
+  id          String            @id @default(uuid()) @db.Uuid
+  category    EquipmentCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  users       UserEquipment[]
+}
+
+model UserEquipment {
+  id        String        @id @default(uuid()) @db.Uuid
+  userId    String        @db.Uuid
+  itemId    String        @db.Uuid
+  checked   Boolean       @default(false)
+  updatedAt DateTime      @updatedAt @db.Timestamp(6)
+  item      EquipmentItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+  @@map("user_equipment")
+}
+
+enum UserRole {
+  ADMIN
+  MEMBER
+}
+
 enum MediaType {
   IMAGE
   VIDEO
@@ -56,80 +157,10 @@ enum MediaSection {
   GALLERY
 }
 
-model HeroText {
-  id          String   @id @default(uuid()) @db.Uuid
-  titleLine1  String   @default("Selamat Datang di")
-  titleLine2  String   @default("Leher Adventure")
-  description String   @default("Jelajahi keindahan alam Indonesia bersama kami. Setiap perjalanan adalah cerita yang tak terlupakan.")
-  updatedAt   DateTime @updatedAt @db.Timestamp(6)
-}
-
-model Mountain {
-  id         String   @id @default(uuid()) @db.Uuid
-  name       String
-  height     Int?
-  location   String?
-  difficulty String?
-  image      String?
-  createdAt  DateTime @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime @updatedAt @db.Timestamp(6)
-
-  journeys Journey[]
-}
-
-model Journey {
-  id          String        @id @default(uuid()) @db.Uuid
-  mountainId  String        @db.Uuid
-  year        Int           @default(2024)
-  status      JourneyStatus @default(PLANNED)
-  startDate   DateTime?
-  endDate     DateTime?
-  via         String?
-  createdAt   DateTime      @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime      @updatedAt @db.Timestamp(6)
-
-  mountain Mountain @relation(fields: [mountainId], references: [id], onDelete: Cascade)
-  registrations JourneyRegistration[]
-  expenses Expense[]
-}
-
-model JourneyRegistration {
-  id        String   @id @default(uuid()) @db.Uuid
-  journeyId String   @db.Uuid
-  userId    String   @db.Uuid
-  phone     String
-  email     String
-  status    RegistrationStatus @default(PENDING)
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
-  journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([journeyId, userId])
-  @@map("journey_registration")
-}
-
 enum RegistrationStatus {
   PENDING
   APPROVED
   REJECTED
-}
-
-model Expense {
-  id          String        @id @default(uuid()) @db.Uuid
-  journeyId   String?       @db.Uuid
-  category    ExpenseCategory
-  title       String
-  amount      Int
-  description String?
-  date        DateTime      @default(now())
-  createdAt   DateTime      @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime      @updatedAt @db.Timestamp(6)
-
-  journey Journey? @relation(fields: [journeyId], references: [id], onDelete: SetNull)
-
-  @@map("expense")
 }
 
 enum ExpenseCategory {
@@ -145,41 +176,4 @@ enum JourneyStatus {
   ONGOING
   COMPLETED
   CANCELLED
-}
-
-model EquipmentCategory {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String   @unique
-  order     Int      @default(0)
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
-  items EquipmentItem[]
-}
-
-model EquipmentItem {
-  id          String   @id @default(uuid()) @db.Uuid
-  categoryId  String   @db.Uuid
-  name        String
-  description String?
-  required    Boolean  @default(false)
-  createdAt   DateTime @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime @updatedAt @db.Timestamp(6)
-
-  category EquipmentCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  users    UserEquipment[]
-}
-
-model UserEquipment {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  itemId    String   @db.Uuid
-  checked   Boolean  @default(false)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
-  user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  item EquipmentItem  @relation(fields: [itemId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, itemId])
-  @@map("user_equipment")
 }

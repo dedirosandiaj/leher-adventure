@@ -2,7 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import styles from './profile.module.css';
+
+// Dynamic import for JourneyMap (client-side only)
+const JourneyMap = dynamic(() => import('./JourneyMap'), {
+  ssr: false,
+  loading: () => <div className={styles.mapLoading}>Memuat peta...</div>
+});
 
 const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -44,10 +51,7 @@ const LocationIcon = () => (
 function formatDate(date) {
   if (!date) return '';
   const d = new Date(date);
-  return d.toLocaleDateString('id-ID', { 
-    month: 'long', 
-    year: 'numeric'
-  });
+  return d.getFullYear().toString();
 }
 
 export default function ProfileDetailClient({ user, journeys }) {
@@ -110,6 +114,19 @@ export default function ProfileDetailClient({ user, journeys }) {
             <InstagramIcon />
             <span>@{igUsername}</span>
           </a>
+        </div>
+      </div>
+
+      {/* Journey Map */}
+      <div className={styles.mapSection}>
+        <div className="container">
+          <div className={styles.journeysHeader}>
+            <h2 className={styles.journeysTitle}>
+              <MountainIcon />
+              Peta Riwayat Pendakian
+            </h2>
+          </div>
+          <JourneyMap journeys={journeys} />
         </div>
       </div>
 

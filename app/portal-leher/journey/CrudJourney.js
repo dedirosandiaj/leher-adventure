@@ -237,6 +237,27 @@ export default function CrudJourney({ journeys: initialJourneys }) {
 
           <div className={styles.formRow}>
             <div className={styles.inputGroup}>
+              <label>Latitude (Koordinat)</label>
+              <input 
+                type="number" 
+                name="latitude" 
+                placeholder="-8.4113"
+                step="any"
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>Longitude (Koordinat)</label>
+              <input 
+                type="number" 
+                name="longitude" 
+                placeholder="116.4570"
+                step="any"
+              />
+            </div>
+          </div>
+
+          <div className={styles.formRow}>
+            <div className={styles.inputGroup}>
               <label>Tanggal Mulai</label>
               <input 
                 type="date" 

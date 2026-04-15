@@ -14,7 +14,6 @@ export default async function Journey() {
     if (!acc[year]) {
       acc[year] = {
         year,
-        status: journey.status,
         mountains: [],
       };
     }
@@ -27,8 +26,23 @@ export default async function Journey() {
     return acc;
   }, {});
   
-  // Convert to array and sort by year desc
-  const formattedJourneys = Object.values(journeysMap).sort((a, b) => b.year - a.year);
+  // Add hasPlanned flag to each year group
+  Object.keys(journeysMap).forEach(year => {
+    const yearJourneys = journeys.filter(j => j.year === parseInt(year));
+    journeysMap[year].hasPlanned = yearJourneys.some(j => j.status === 'PLANNED');
+    journeysMap[year].status = yearJourneys.some(j => j.status === 'PLANNED') ? 'PLANNED' : 
+                               yearJourneys.some(j => j.status === 'ONGOING') ? 'ONGOING' : 'COMPLETED';
+  });
+  
+  // Convert to array and sort: Rencana (PLANNED) first, then by year desc
+  const formattedJourneys = Object.values(journeysMap).sort((a, b) => {
+    // Prioritize years that have PLANNED journeys
+    if (a.hasPlanned && !b.hasPlanned) return -1;
+    if (!a.hasPlanned && b.hasPlanned) return 1;
+    
+    // If same priority, sort by year desc
+    return b.year - a.year;
+  });
 
   return <JourneyClient journeys={formattedJourneys} />;
 }

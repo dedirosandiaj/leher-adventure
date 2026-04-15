@@ -20,6 +20,8 @@ export async function addMountain(prevState, formData) {
   const year = parseInt(formData.get('year'));
   const status = formData.get('status') || 'Rencana';
   const via = formData.get('via')?.trim();
+  const latitude = formData.get('latitude') ? parseFloat(formData.get('latitude')) : null;
+  const longitude = formData.get('longitude') ? parseFloat(formData.get('longitude')) : null;
   const startDate = formData.get('startDate');
   const endDate = formData.get('endDate');
   const id = formData.get('id');
@@ -50,10 +52,10 @@ export async function addMountain(prevState, formData) {
     };
 
     if (id) {
-      // Update - update both Mountain name and Journey year/status
+      // Update - update both Mountain and Journey
       await prisma.mountain.update({
         where: { id },
-        data: { name },
+        data: { name, latitude, longitude },
       });
       
       // Update related journey
@@ -70,7 +72,7 @@ export async function addMountain(prevState, formData) {
     } else {
       // Create - create Mountain and Journey
       const mountain = await prisma.mountain.create({
-        data: { name },
+        data: { name, latitude, longitude },
       });
       
       await prisma.journey.create({

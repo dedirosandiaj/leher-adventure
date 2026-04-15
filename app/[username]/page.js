@@ -4,6 +4,10 @@ import { notFound } from 'next/navigation';
 import Footer from '@/components/Footer';
 import ProfileDetailClient from './ProfileDetailClient';
 
+// Force dynamic rendering untuk generate presigned URL saat request
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function generateMetadata({ params }) {
   const { username } = await params;
   const user = await prisma.user.findUnique({
@@ -72,104 +76,68 @@ export default async function ProfilePage({ params }) {
     notFound();
   }
 
-  // Get completed journeys where user was registered and approved
-  const registrations = await prisma.journeyRegistration.findMany({
+  // Get all completed journeys (always show all, no registration required)
+  const allCompletedJourneys = await prisma.journey.findMany({
     where: {
-      userId: user.id,
-      status: 'APPROVED',
-      journey: {
-        status: 'COMPLETED'
-      }
+      status: 'COMPLETED'
     },
     include: {
-      journey: {
-        include: {
-          mountain: true
-        }
-      }
+      mountain: true
     },
     orderBy: {
-      journey: {
-        startDate: 'desc'
-      }
+      startDate: 'desc'
     }
   });
 
-  let completedJourneys;
+  const completedJourneys = allCompletedJourneys.map(j => ({
+    id: j.id,
+    mountainName: j.mountain.name,
+    mountainLocation: j.mountain.location,
+    year: j.year,
+    startDate: j.startDate,
+    endDate: j.endDate,
+    description: j.description,
+    mountainImage: j.mountain.image,
+    latitude: j.mountain.latitude,
+    longitude: j.mountain.longitude,
+  }));
 
-  if (registrations.length > 0) {
-    // User has personal journey history
-    completedJourneys = registrations.map(r => ({
-      id: r.journey.id,
-      mountainName: r.journey.mountain.name,
-      mountainLocation: r.journey.mountain.location,
-      year: r.journey.year,
-      startDate: r.journey.startDate,
-      endDate: r.journey.endDate,
-      description: r.journey.description,
-      mountainImage: r.journey.mountain.image,
-    }));
-  } else {
-    // Show all completed journeys if user has no personal history
-    const allCompletedJourneys = await prisma.journey.findMany({
-      where: {
-        status: 'COMPLETED'
-      },
-      include: {
-        mountain: true
-      },
-      orderBy: {
-        startDate: 'desc'
-      }
-    });
-
-    completedJourneys = allCompletedJourneys.map(j => ({
-      id: j.id,
-      mountainName: j.mountain.name,
-      mountainLocation: j.mountain.location,
-      year: j.year,
-      startDate: j.startDate,
-      endDate: j.endDate,
-      description: j.description,
-      mountainImage: j.mountain.image,
-    }));
-  }
-
-  // Convert photo to presigned URL
+  // Generate presigned URLs for private S3 bucket
   let photoUrl = user.photo;
   if (photoUrl) {
     const key = getKeyFromUrl(photoUrl);
     if (key) {
       try {
-        photoUrl = await getPresignedUrl(key, 86400);
+        photoUrl = await getPresignedUrl(key, 86400); // 24 hours
       } catch (err) {
-        console.error('Error generating presigned URL:', err);
+        console.error('Error generating presigned URL for photo:', err);
       }
     }
   }
-
-  // Convert mountain images to presigned URLs
-  const journeysWithPresignedImages = await Promise.all(
-    completedJourneys.map(async (journey) => {
-      if (journey.mountainImage) {
-        const key = getKeyFromUrl(journey.mountainImage);
-        if (key) {
-          try {
-            const presignedUrl = await getPresignedUrl(key, 86400);
-            return { ...journey, mountainImage: presignedUrl };
-          } catch (err) {
-            console.error('Error generating presigned URL for mountain:', err);
-          }
-        }
-      }
-      return journey;
-    })
-  );
 
   const userData = {
     ...user,
     photo: photoUrl,
   };
+
+  // Generate presigned URLs for mountain images
+  const journeysWithImages = await Promise.all(
+    completedJourneys.map(async (journey) => {
+      let updatedJourney = { ...journey };
+      if (journey.mountainImage) {
+        const key = getKeyFromUrl(journey.mountainImage);
+        if (key) {
+          try {
+            const presignedUrl = await getPresignedUrl(key, 86400);
+            updatedJourney.mountainImage = presignedUrl;
+          } catch (err) {
+            console.error('Error generating presigned URL for mountain:', err);
+          }
+        }
+      }
+      return updatedJourney;
+    })
+  );
 
   // JSON-LD Structured Data for SEO
   const jsonLd = {
@@ -200,7 +168,7 @@ export default async function ProfilePage({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProfileDetailClient user={userData} journeys={journeysWithPresignedImages} />
+      <ProfileDetailClient user={userData} journeys={journeysWithImages} />
       <Footer />
     </main>
   );
