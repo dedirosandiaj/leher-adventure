@@ -7,16 +7,24 @@ import { verifyToken } from '@/lib/auth';
 function formatPrivateKey(key) {
   if (!key) return null;
   
-  // Replace escaped newlines with actual newlines
-  let formatted = key.replace(/\\n/g, '\n');
+  let formatted = key;
   
-  // Ensure proper PEM format
-  if (!formatted.startsWith('-----BEGIN PRIVATE KEY-----')) {
-    formatted = '-----BEGIN PRIVATE KEY-----\n' + formatted;
+  // Method 1: If key contains literal \n (backslash-n), replace with actual newlines
+  if (formatted.includes('\\n')) {
+    formatted = formatted.replace(/\\n/g, '\n');
   }
-  if (!formatted.endsWith('-----END PRIVATE KEY-----\n')) {
-    formatted = formatted + '\n-----END PRIVATE KEY-----\n';
-  }
+  
+  // Method 2: Trim whitespace
+  formatted = formatted.trim();
+  
+  // Method 3: Ensure proper PEM format
+  // Remove existing headers if they exist without proper newlines
+  formatted = formatted.replace(/-----BEGIN PRIVATE KEY-----/g, '');
+  formatted = formatted.replace(/-----END PRIVATE KEY-----/g, '');
+  formatted = formatted.trim();
+  
+  // Add proper headers
+  formatted = '-----BEGIN PRIVATE KEY-----\n' + formatted + '\n-----END PRIVATE KEY-----\n';
   
   return formatted;
 }
