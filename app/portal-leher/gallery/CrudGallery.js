@@ -27,6 +27,11 @@ export default function CrudGallery({ items }) {
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [drivePickerOpen, setDrivePickerOpen] = useState(false);
+  const [driveFiles, setDriveFiles] = useState([]);
+  const [loadingDriveFiles, setLoadingDriveFiles] = useState(false);
+  const [drivePageToken, setDrivePageToken] = useState(null);
+  const [loadingMoreDrive, setLoadingMoreDrive] = useState(false);
   const fileInputRef = useRef(null);
   const thumbnailInputRef = useRef(null);
   const formRef = useRef(null);
@@ -86,6 +91,50 @@ export default function CrudGallery({ items }) {
     if (formRef.current) formRef.current.reset();
   };
 
+  const loadDriveFiles = async (pageToken = null, append = false) => {
+    if (!append) {
+      setLoadingDriveFiles(true);
+    } else {
+      setLoadingMoreDrive(true);
+    }
+    try {
+      // Use the new endpoint that fetches ALL images from Google Drive
+      const url = pageToken 
+        ? `/api/portal-leher/gallery/drive-images?pageToken=${pageToken}`
+        : '/api/portal-leher/gallery/drive-images';
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (append) {
+        setDriveFiles(prev => [...prev, ...(data.files || [])]);
+      } else {
+        setDriveFiles(data.files || []);
+      }
+      setDrivePageToken(data.nextPageToken || null);
+    } catch (error) {
+      console.error('Error loading drive files:', error);
+    } finally {
+      setLoadingDriveFiles(false);
+      setLoadingMoreDrive(false);
+    }
+  };
+
+  const handleDrivePickerOpen = () => {
+    setDrivePickerOpen(true);
+    loadDriveFiles();
+  };
+
+  const handleDriveFileSelect = (file) => {
+    // Use the thumbnail URL from Google Drive
+    setPreviewUrl(file.thumbnailUrl);
+    // Store the drive file info for later use
+    window.selectedDriveFile = file;
+    setDrivePickerOpen(false);
+    // Reset drive files to free memory
+    setDriveFiles([]);
+    setDrivePageToken(null);
+  };
+
   const handleCrop = () => {
     if (cropperRef.current) {
       const canvas = cropperRef.current.cropper.getCroppedCanvas({
@@ -124,8 +173,19 @@ export default function CrudGallery({ items }) {
     try {
       const formData = new FormData(e.target);
       
+      // Check if image is from Google Drive
+      const driveFile = window.selectedDriveFile;
+      if (mediaType === 'IMAGE' && driveFile && !croppedImage) {
+        // Download image from Google Drive and convert to File
+        const response = await fetch(driveFile.thumbnailUrl);
+        const blob = await response.blob();
+        const file = new File([blob], driveFile.name || 'drive-image.jpg', { type: blob.type });
+        formData.set('imageFile', file);
+        // Clear the selected drive file
+        delete window.selectedDriveFile;
+      }
       // For IMAGE type, use cropped image if available
-      if (mediaType === 'IMAGE' && croppedImage) {
+      else if (mediaType === 'IMAGE' && croppedImage) {
         const croppedFile = dataURLtoFile(croppedImage, 'gallery-image.jpg');
         formData.set('imageFile', croppedFile);
       }
@@ -181,15 +241,42 @@ export default function CrudGallery({ items }) {
           {mediaType === 'IMAGE' ? (
             <div className={styles.inputGroup} style={{marginTop:'1rem'}}>
               <label>Upload Gambar</label>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={handleDrivePickerOpen}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem 1rem',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: 500,
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  📁 Pilih dari Google Drive
+                </button>
+              </div>
               {!previewUrl && (
-                <input 
-                  ref={fileInputRef}
-                  type="file" 
-                  name="imageFile" 
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  required
-                />
+                <>
+                  <div style={{ textAlign: 'center', color: '#999', fontSize: '0.85rem', margin: '0.5rem 0' }}>
+                    atau upload file dari komputer
+                  </div>
+                  <input 
+                    ref={fileInputRef}
+                    type="file" 
+                    name="imageFile" 
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    required
+                  />
+                </>
               )}
               
               {previewUrl && !croppedImage && (
@@ -322,6 +409,155 @@ export default function CrudGallery({ items }) {
           </div>
         )}
       </div>
+
+      {/* Google Drive Picker Modal */}
+      {drivePickerOpen && (
+        <div 
+          className={styles.imageModalOverlay}
+          onClick={() => setDrivePickerOpen(false)}
+        >
+          <div 
+            className={styles.imageModalContent}
+            onClick={e => e.stopPropagation()}
+            style={{ 
+              width: '98vw',
+              maxWidth: '1600px',
+              maxHeight: '98vh',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <div style={{ 
+              padding: '1.5rem', 
+              borderBottom: '1px solid #eee',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--primary)' }}>
+                📁 Pilih Foto dari Google Drive ({driveFiles.length} foto)
+              </h3>
+              <button 
+                className={styles.imageModalCloseBtn} 
+                onClick={() => setDrivePickerOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div style={{ 
+              padding: '1.5rem',
+              flex: 1,
+              overflow: 'auto'
+            }}>
+              {loadingDriveFiles ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
+                  <p>Memuat foto dari Google Drive...</p>
+                </div>
+              ) : driveFiles.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
+                  <p>Tidak ada foto di Google Drive</p>
+                </div>
+              ) : (
+                <>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gap: '1.25rem'
+                  }}>
+                    {driveFiles.map((file) => (
+                      <div
+                        key={file.id}
+                        onClick={() => handleDriveFileSelect(file)}
+                        style={{
+                          background: 'white',
+                          borderRadius: '12px',
+                          border: '2px solid #e9ecef',
+                          padding: '0.75rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--primary)';
+                          e.currentTarget.style.transform = 'translateY(-4px)';
+                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = '#e9ecef';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <div style={{
+                          width: '100%',
+                          height: '160px',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          marginBottom: '0.5rem',
+                          background: '#f8f9fa',
+                        }}>
+                          <img 
+                            src={file.thumbnailUrl} 
+                            alt={file.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                            }}
+                          />
+                        </div>
+                        <div style={{
+                          fontSize: '0.85rem',
+                          color: '#666',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}>
+                          {file.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {drivePageToken && (
+                    <div style={{ 
+                      textAlign: 'center', 
+                      marginTop: '2rem',
+                      paddingTop: '1.5rem',
+                      borderTop: '1px solid #eee'
+                    }}>
+                      <button
+                        onClick={() => loadDriveFiles(drivePageToken, true)}
+                        disabled={loadingMoreDrive}
+                        style={{
+                          padding: '0.75rem 2rem',
+                          background: loadingMoreDrive ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: loadingMoreDrive ? 'not-allowed' : 'pointer',
+                          fontSize: '0.95rem',
+                          fontWeight: 500,
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!loadingMoreDrive) e.currentTarget.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                      >
+                        {loadingMoreDrive ? 'Memuat...' : 'Muat Lebih Banyak'}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={modalOpen}

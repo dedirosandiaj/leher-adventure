@@ -4,6 +4,18 @@
    ============================================ */
 
 /* ----------------------------------------
+   ANIMATIONS
+   ---------------------------------------- */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ----------------------------------------
    PAGE HEADER
    ---------------------------------------- */
 .pageTitle {
@@ -1755,4 +1767,110 @@
 .iconBtn.danger:hover {
   background: rgba(231, 76, 60, 0.1);
   border-color: #e74c3c;
+}
+
+/* Image Preview Modal */
+.imageModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 2rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.imageModalContent {
+  position: relative;
+  width: 90vw;
+  max-width: 1200px;
+  max-height: 90vh;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.imageModalImageWrapper {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  max-height: 90vh;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 1.5rem 1.5rem;
+  overflow: auto;
+}
+
+.imageModalImage {
+  max-width: 100%;
+  max-height: calc(90vh - 5rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
+.imageModalCloseBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  color: #333;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.imageModalCloseBtn:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.imageModalCloseBtn:active {
+  transform: scale(0.95);
 }
