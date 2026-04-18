@@ -33,15 +33,36 @@ export async function GET(request, { params }) {
       );
     }
 
+    // Get size parameter from URL (default s220 for thumbnails)
+    const { searchParams } = new URL(request.url);
+    const size = searchParams.get('size') || 's220'; // s220 = 220px, s400 = 400px
+
     const drive = getDriveClient();
 
-    // Get file metadata to get download URL
+    // Get thumbnail URL from file metadata (much faster than downloading full file)
     const file = await drive.files.get({
       fileId: fileId,
-      fields: 'mimeType',
+      fields: 'mimeType, thumbnailLink',
     });
 
-    // Download the file (thumbnail)
+    // If thumbnail link is available, use it with optimized size
+    if (file.data.thumbnailLink) {
+      // Replace size parameter with requested size
+      const thumbnailUrl = file.data.thumbnailLink.replace(/=s[0-9]+-c/, `=${size}-c`);
+      
+      // Fetch the thumbnail
+      const thumbnailResponse = await fetch(thumbnailUrl);
+      const thumbnailBuffer = await thumbnailResponse.arrayBuffer();
+      
+      return new NextResponse(Buffer.from(thumbnailBuffer), {
+        headers: {
+          'Content-Type': file.data.mimeType || 'image/jpeg',
+          'Cache-Control': 'public, max-age=604800', // 7 days cache for thumbnails
+        },
+      });
+    }
+
+    // Fallback: Download full file if no thumbnail
     const response = await drive.files.get(
       {
         fileId: fileId,

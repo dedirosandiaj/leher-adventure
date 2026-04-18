@@ -26,29 +26,29 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const pageToken = searchParams.get('pageToken');
-    const pageSize = 50; // Number of images per page
+    const pageSize = 30; // Reduced from 50 for faster initial load
 
     const drive = getDriveClient();
 
     // Search for all images in Google Drive (excluding trash)
     // Use 'mimeType contains "image/"' to get all image types
+    // Only fetch essential fields for faster response
     const response = await drive.files.list({
       q: 'mimeType contains "image/" and trashed = false',
-      fields: 'files(id, name, mimeType, size, modifiedTime, webViewLink, webContentLink, thumbnailLink), nextPageToken',
+      fields: 'files(id, name, thumbnailLink), nextPageToken',
       orderBy: 'modifiedTime desc',
       pageSize: pageSize,
       pageToken: pageToken || undefined,
     });
 
-    // Add thumbnail URL for images - use our proxy endpoint
+    // Add thumbnail URL for images - use our proxy endpoint for authenticated access
     const filesWithThumbnails = (response.data.files || []).map(file => {
-      if (file.id) {
-        return {
-          ...file,
-          thumbnailUrl: `/api/portal-leher/file-manager/image/${file.id}`,
-        };
-      }
-      return file;
+      // Add size parameter for smaller thumbnails (s220 = 220px, lebih kecil = lebih cepat)
+      return {
+        id: file.id,
+        name: file.name,
+        thumbnailUrl: `/api/portal-leher/file-manager/image/${file.id}?size=s220`,
+      };
     });
 
     return NextResponse.json({

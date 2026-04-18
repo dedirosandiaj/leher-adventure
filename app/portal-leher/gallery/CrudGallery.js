@@ -452,8 +452,38 @@ export default function CrudGallery({ items }) {
               overflow: 'auto'
             }}>
               {loadingDriveFiles ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
-                  <p>Memuat foto dari Google Drive...</p>
+                <div style={{ 
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: '1.25rem'
+                }}>
+                  {/* Skeleton loaders */}
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} style={{
+                      background: 'white',
+                      borderRadius: '12px',
+                      border: '2px solid #e9ecef',
+                      padding: '0.75rem',
+                    }}>
+                      <div style={{
+                        width: '100%',
+                        height: '160px',
+                        borderRadius: '8px',
+                        background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                        backgroundSize: '200% 100%',
+                        animation: 'loading 1.5s infinite',
+                        marginBottom: '0.5rem',
+                      }} />
+                      <div style={{
+                        height: '16px',
+                        background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                        backgroundSize: '200% 100%',
+                        animation: 'loading 1.5s infinite',
+                        borderRadius: '4px',
+                        width: '80%',
+                      }} />
+                    </div>
+                  ))}
                 </div>
               ) : driveFiles.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
@@ -495,15 +525,27 @@ export default function CrudGallery({ items }) {
                           borderRadius: '8px',
                           overflow: 'hidden',
                           marginBottom: '0.5rem',
-                          background: '#f8f9fa',
+                          background: '#f0f0f0',
+                          position: 'relative',
                         }}>
                           <img 
                             src={file.thumbnailUrl} 
                             alt={file.name}
+                            loading="lazy"
                             style={{
                               width: '100%',
                               height: '100%',
                               objectFit: 'cover',
+                              opacity: 0,
+                              transition: 'opacity 0.3s',
+                            }}
+                            onLoad={(e) => {
+                              e.target.style.opacity = 1;
+                            }}
+                            onError={(e) => {
+                              // Show placeholder on error
+                              e.target.style.display = 'none';
+                              e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:0.8rem;">⚠️ Gagal load</div>';
                             }}
                           />
                         </div>
