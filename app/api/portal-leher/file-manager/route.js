@@ -1,67 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { google } from 'googleapis';
 import { verifyToken } from '@/lib/auth';
-
-// Helper function to properly format private key
-function formatPrivateKey(key) {
-  if (!key) return null;
-  
-  let formatted = key;
-  
-  // Method 1: If key contains literal \n (backslash-n), replace with actual newlines
-  if (formatted.includes('\\n')) {
-    formatted = formatted.replace(/\\n/g, '\n');
-  }
-  
-  // Method 2: Trim whitespace
-  formatted = formatted.trim();
-  
-  // Method 3: Ensure proper PEM format
-  // Remove existing headers if they exist without proper newlines
-  formatted = formatted.replace(/-----BEGIN PRIVATE KEY-----/g, '');
-  formatted = formatted.replace(/-----END PRIVATE KEY-----/g, '');
-  formatted = formatted.trim();
-  
-  // Add proper headers
-  formatted = '-----BEGIN PRIVATE KEY-----\n' + formatted + '\n-----END PRIVATE KEY-----\n';
-  
-  return formatted;
-}
-
-// Initialize Google Drive API
-function getDriveClient() {
-  const privateKey = formatPrivateKey(process.env.GOOGLE_PRIVATE_KEY);
-  
-  const credentials = {
-    type: 'service_account',
-    project_id: process.env.GOOGLE_PROJECT_ID,
-    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
-    private_key: privateKey,
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-    token_uri: 'https://oauth2.googleapis.com/token',
-    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-    client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL,
-  };
-
-  console.log('Google Drive credentials loaded:', {
-    project_id: credentials.project_id,
-    client_email: credentials.client_email,
-    private_key_exists: !!credentials.private_key,
-    private_key_length: credentials.private_key?.length || 0,
-    private_key_starts_correctly: credentials.private_key?.startsWith('-----BEGIN PRIVATE KEY-----'),
-    private_key_ends_correctly: credentials.private_key?.endsWith('-----END PRIVATE KEY-----\n'),
-  });
-
-  const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-  });
-
-  return google.drive({ version: 'v3', auth });
-}
+import { getDriveClient } from '@/lib/google-drive';
 
 export async function GET(request) {
   try {
